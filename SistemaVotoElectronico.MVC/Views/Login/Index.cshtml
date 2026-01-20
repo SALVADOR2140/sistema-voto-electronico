@@ -1,59 +1,74 @@
 ﻿@{
+    Layout = null;
     ViewData["Title"] = "Iniciar Sesión";
-    Layout = null; 
-    }
+}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Sistema Voto</title>
+    <title>@ViewData["Title"] - Sistema Voto</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <style>
-        body {
-            background-color: #f0f2f5;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
 
-        .card-login {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            background: white;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="~/css/login.css" />
+
+    <script>
+        document.body.classList.add('login-page');
+    </script>
 </head>
-<body>
+<body class="login-page">
 
-    <div class="card-login text-center">
-        <img src="https://cdn-icons-png.flaticon.com/512/2633/2633302.png" width="80" class="mb-3" alt="Logo" />
-        <h3 class="mb-4">Acceso al Sistema</h3>
+    <div class="d-flex justify-content-center w-100 login-container-wrapper">
+        <div class="login-card text-center">
 
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger">@ViewBag.Error</div>
-        }
+            <img src="~/imagenes/logo-utn-150-140x140.png" alt="Logo UTN" class="logo-img" />
 
-        <form action="/Login/Entrar" method="post">
-            <div class="form-floating mb-3">
-                <input type="text" name="usuario" class="form-control" id="user" placeholder="Usuario" required>
-                <label for="user">Usuario</label>
+            <h3 class="fw-bold text-secondary mb-2 text-uppercase">ELECCIONES UTN 2026</h3>
+            <p class="text-muted mb-4 small">Sistema de  Voto Electronico</p>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger py-2 small shadow-sm" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> @ViewBag.Error
+                </div>
+            }
+
+            <form action="/Login/Entrar" method="post" class="text-start mt-3">
+
+                <div class="mb-3">
+                    <label class="form-label text-muted fw-bold small">USUARIO</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-secondary"></i></span>
+                        <input type="text" class="form-control bg-light border-start-0 ps-0" name="usuario" id="user" placeholder="Ingrese su usuario" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold small">CONTRASEÑA</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-secondary"></i></span>
+                        <input type="password" class="form-control bg-light border-start-0 ps-0" name="clave" id="pass" placeholder="••••••" required>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary py-2 fw-bold shadow-sm rounded-pill">
+                        INGRESAR
+                    </button>
+                </div>
+
+            </form>
+
+            <div class="mt-4 pt-3 border-top text-muted">
+                <small>Credenciales de prueba: <b>admin / 1234</b></small> <br>
+                <a href="/" class="text-decoration-none small mt-2 d-inline-block">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Volver al Inicio
+                </a>
             </div>
-            <div class="form-floating mb-3">
-                <input type="password" name="clave" class="form-control" id="pass" placeholder="Contraseña" required>
-                <label for="pass">Contraseña</label>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100 btn-lg">Ingresar</button>
-        </form>
-
-        <div class="mt-3 text-muted">
-            <small>Credenciales de prueba: admin / 1234</small>
         </div>
     </div>
 

@@ -2,40 +2,44 @@
     ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center mt-5">
-    <h1 class="display-3 fw-bold text-primary">Sistema de Voto Electrónico</h1>
-    <h2 class="text-secondary mb-4">Elecciones 2026</h2>
+<div class="p-5 mb-4 bg-light rounded-3 shadow border-start border-5 border-primary">
+    <div class="container-fluid py-3 text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/2633/2633302.png" alt="Urna" width="120" class="mb-4" />
 
-    <img src="https://cdn-icons-png.flaticon.com/512/2633/2633302.png" alt="Urna Electoral" width="150" class="mb-4" />
+        <h1 class="display-4 fw-bold text-primary">Elecciones Generales 2026</h1>
+        <p class="col-md-8 fs-4 mx-auto text-secondary">
+            Bienvenido al <strong>Sistema de Voto Electrónico</strong>.
+            Ejerce tu derecho de manera rápida, segura y transparente desde cualquier lugar.
+        </p>
 
-    <p class="lead">
-        Bienvenido a la plataforma oficial de sufragio digital.
-        <br />
-        Garantizamos un proceso transparente, seguro y rápido.
-    </p>
-
-    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-        <a href="/EventosElectorales" class="btn btn-primary btn-lg px-4 gap-3">
-            <i class="fa-solid fa-check-to-slot"></i> Ver Elecciones Activas
-        </a>
-
-        <button type="button" class="btn btn-outline-secondary btn-lg px-4">
-            Consultar Resultados
-        </button>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a asp-controller="EventosElectorales" asp-action="Index" class="btn btn-primary btn-lg px-5 py-3 shadow">
+                <i class="fa-solid fa-check-to-slot me-2"></i> VER ELECCIONES ACTIVAS
+            </a>
+            <button type="button" class="btn btn-outline-dark btn-lg px-4 py-3">
+                <i class="fa-solid fa-chart-simple me-2"></i> Resultados
+            </button>
+        </div>
     </div>
 </div>
 
-<div class="row mt-5 pt-5 border-top">
-    <div class="col-md-4 text-center">
-        <h3>🔒 Seguro</h3>
-        <p>Sus datos están protegidos con los más altos estándares de encriptación.</p>
+<div class="row align-items-md-stretch mt-4">
+    <div class="col-md-4 mb-3">
+        <div class="h-100 p-4 text-white bg-primary rounded-3 shadow-sm">
+            <h2 class="h4"><i class="fa-solid fa-shield-halved me-2"></i>Seguridad</h2>
+            <p>Tu voto está encriptado y protegido. Garantizamos el anonimato total de tu elección en todo momento.</p>
+        </div>
     </div>
-    <div class="col-md-4 text-center">
-        <h3>⚡ Rápido</h3>
-        <p>Ejerza su derecho al voto en menos de 1 minuto desde cualquier lugar.</p>
+    <div class="col-md-4 mb-3">
+        <div class="h-100 p-4 bg-white border rounded-3 shadow-sm text-center">
+            <h2 class="h4 text-dark"><i class="fa-solid fa-bolt me-2 text-warning"></i>Rapidez</h2>
+            <p>Olvídate de las filas. El proceso de votación digital toma menos de 2 minutos.</p>
+        </div>
     </div>
-    <div class="col-md-4 text-center">
-        <h3>📊 Transparente</h3>
-        <p>Resultados verificables y actualizados en tiempo real al cerrar las urnas.</p>
+    <div class="col-md-4 mb-3">
+        <div class="h-100 p-4 text-white bg-dark rounded-3 shadow-sm">
+            <h2 class="h4"><i class="fa-solid fa-magnifying-glass me-2"></i>Transparencia</h2>
+            <p>Resultados auditables y disponibles para todos los ciudadanos al cierre de la jornada.</p>
+        </div>
     </div>
 </div>
