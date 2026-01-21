@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVoto.Modelos;
+using SistemaVotoElectronico.Api.Controllers;
+
 
 namespace SistemaVotoElectronico.Api.Controllers
 {
@@ -20,88 +22,90 @@ namespace SistemaVotoElectronico.Api.Controllers
             _context = context;
         }
 
-        // GET: api/Votos
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Voto>>> GetVoto()
+        // DTO: Clase auxiliar para recibir solo lo necesario
+        public class IntencionVoto
         {
-            return await _context.Votos.ToListAsync();
+            public int UsuarioId { get; set; }
+            public int EventoId { get; set; }
+            public int? ListaId { get; set; }
         }
 
-        // GET: api/Votos/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Voto>> GetVoto(int id)
+        // POST: api/Votos/Emitir
+        [HttpPost("Emitir")]
+        public async Task<IActionResult> EmitirVoto([FromBody] IntencionVoto datos)
         {
-            var voto = await _context.Votos.FindAsync(id);
+            var usuario = await _context.Usuarios.FindAsync(datos.UsuarioId);
+            if (usuario == null) return BadRequest("Usuario no encontrado.");
+            if (usuario.YaVoto) return BadRequest("Este usuario ya sufragó.");
 
-            if (voto == null)
-            {
-                return NotFound();
-            }
+            var evento = await _context.EventosElectorales.FindAsync(datos.EventoId);
+            if (evento == null || !evento.Activo) return BadRequest("La elección no está activa.");
 
-            return voto;
-        }
-
-        // PUT: api/Votos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutVoto(int id, Voto voto)
-        {
-            if (id != voto.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(voto).State = EntityState.Modified;
-
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                var voto = new Voto
+                {
+                    Fecha = DateTime.Now,
+
+                    EventoElectoralId = datos.EventoId,
+
+                    ListaPoliticaId = datos.ListaId,
+
+                    HashSeguridad = Guid.NewGuid().ToString()
+                };
+
+                var certificado = new Certificado
+                {
+                    UsuarioId = datos.UsuarioId,
+                    EventoElectoralId = datos.EventoId,
+                    FechaEmision = DateTime.Now,
+                    CodigoQR = Guid.NewGuid().ToString() 
+                };
+                _context.Certificados.Add(certificado);
+
+                usuario.YaVoto = true;
+                _context.Entry(usuario).State = EntityState.Modified;
+
+ 
+                if (datos.ListaId.HasValue)
+                {
+                    var resultado = await _context.ResultadosElecciones
+                        .FirstOrDefaultAsync(r => r.EventoElectoralId == datos.EventoId
+                                               && r.ListaPoliticaId == datos.ListaId.Value);
+
+                    if (resultado == null)
+                    {
+                        resultado = new ResultadoEleccion
+                        {
+                            EventoElectoralId = datos.EventoId,
+                            ListaPoliticaId = datos.ListaId.Value,
+                            TotalVotos = 1
+                        };
+                        _context.ResultadosElecciones.Add(resultado);
+                    }
+                    else
+                    {
+                        resultado.TotalVotos++;
+                        _context.Entry(resultado).State = EntityState.Modified;
+                    }
+                }
+
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!VotoExists(id))
+                await transaction.CommitAsync();
+
+                return Ok(new
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                    mensaje = "Voto registrado con éxito",
+                    codigoCertificado = certificado.CodigoQR
+                });
             }
-
-            return NoContent();
-        }
-
-        // POST: api/Votos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Voto>> PostVoto(Voto voto)
-        {
-            _context.Votos.Add(voto);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetVoto", new { id = voto.Id }, voto);
-        }
-
-        // DELETE: api/Votos/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVoto(int id)
-        {
-            var voto = await _context.Votos.FindAsync(id);
-            if (voto == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                await transaction.RollbackAsync();
+                var errorReal = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return StatusCode(500, "ERROR CRÍTICO: " + errorReal);
             }
-
-            _context.Votos.Remove(voto);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool VotoExists(int id)
-        {
-            return _context.Votos.Any(e => e.Id == id);
         }
     }
 }

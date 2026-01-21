@@ -24,14 +24,14 @@ namespace SistemaVotoElectronico.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ResultadoEleccion>>> GetResultadoEleccion()
         {
-            return await _context.ResultadoEleccion.ToListAsync();
+            return await _context.ResultadosElecciones.ToListAsync();
         }
 
         // GET: api/ResultadosElecciones/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ResultadoEleccion>> GetResultadoEleccion(int id)
         {
-            var resultadoEleccion = await _context.ResultadoEleccion.FindAsync(id);
+            var resultadoEleccion = await _context.ResultadosElecciones.FindAsync(id);
 
             if (resultadoEleccion == null)
             {
@@ -77,7 +77,7 @@ namespace SistemaVotoElectronico.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<ResultadoEleccion>> PostResultadoEleccion(ResultadoEleccion resultadoEleccion)
         {
-            _context.ResultadoEleccion.Add(resultadoEleccion);
+            _context.ResultadosElecciones.Add(resultadoEleccion);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetResultadoEleccion", new { id = resultadoEleccion.Id }, resultadoEleccion);
@@ -87,13 +87,13 @@ namespace SistemaVotoElectronico.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteResultadoEleccion(int id)
         {
-            var resultadoEleccion = await _context.ResultadoEleccion.FindAsync(id);
+            var resultadoEleccion = await _context.ResultadosElecciones.FindAsync(id);
             if (resultadoEleccion == null)
             {
                 return NotFound();
             }
 
-            _context.ResultadoEleccion.Remove(resultadoEleccion);
+            _context.ResultadosElecciones.Remove(resultadoEleccion);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +101,7 @@ namespace SistemaVotoElectronico.Api.Controllers
 
         private bool ResultadoEleccionExists(int id)
         {
-            return _context.ResultadoEleccion.Any(e => e.Id == id);
+            return _context.ResultadosElecciones.Any(e => e.Id == id);
         }
     }
 }

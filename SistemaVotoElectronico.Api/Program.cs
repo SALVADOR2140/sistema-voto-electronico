@@ -9,7 +9,9 @@ namespace SistemaVotoElectronico.Api
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<SistemaVotoElectronicoApiContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SistemaVotoElectronicoApiContext") ?? throw new InvalidOperationException("Connection string 'SistemaVotoElectronicoApiContext' not found.")));
+            //options.UseSqlServer(builder.Configuration.GetConnectionString("SistemaVotoElectronicoApiContext") ?? throw new InvalidOperationException("Connection string 'SistemaVotoElectronicoApiContext' not found.")));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("SistemaVotoElectronicoApiContext.postgresql") ?? throw new InvalidOperationException("Connection string 'SistemaVotoElectronicoApiContext' not found.")));
+
 
             // Add services to the container.
 
