@@ -1,3 +1,5 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SistemaVotoElectronico.Api
 {
@@ -6,6 +8,8 @@ namespace SistemaVotoElectronico.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDbContext<SistemaVotoElectronicoApiContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SistemaVotoElectronicoApiContext") ?? throw new InvalidOperationException("Connection string 'SistemaVotoElectronicoApiContext' not found.")));
 
             // Add services to the container.
 
