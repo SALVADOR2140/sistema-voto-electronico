@@ -20,6 +20,9 @@ namespace SistemaVotoElectronico.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Configuración de licencia para QuestPDF (Gratis para estudiantes)
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

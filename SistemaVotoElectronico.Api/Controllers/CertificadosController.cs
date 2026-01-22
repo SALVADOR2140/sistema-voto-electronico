@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemaVoto.Modelos;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace SistemaVotoElectronico.Api.Controllers
 {
@@ -20,88 +17,52 @@ namespace SistemaVotoElectronico.Api.Controllers
             _context = context;
         }
 
-        // GET: api/Certificados
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Certificado>>> GetCertificado()
+        // GET: api/Certificados/Descargar/1002003001
+        [HttpGet("Descargar/{cedula}")]
+        public async Task<IActionResult> DescargarPorCedula(string cedula)
         {
-            return await _context.Certificados.ToListAsync();
-        }
-
-        // GET: api/Certificados/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Certificado>> GetCertificado(int id)
-        {
-            var certificado = await _context.Certificados.FindAsync(id);
+            var certificado = await _context.Certificados
+                .Include(c => c.Usuario)
+                .Include(c => c.EventoElectoral)
+                .FirstOrDefaultAsync(c => c.Usuario.Cedula == cedula);
 
             if (certificado == null)
-            {
-                return NotFound();
-            }
+                return NotFound("No se encontró un certificado para esta cédula. Asegúrese de haber votado.");
 
-            return certificado;
-        }
-
-        // PUT: api/Certificados/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCertificado(int id, Certificado certificado)
-        {
-            if (id != certificado.Id)
+            var documento = Document.Create(container =>
             {
-                return BadRequest();
-            }
-
-            _context.Entry(certificado).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CertificadoExists(id))
+                container.Page(page =>
                 {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                    page.Size(PageSizes.A4);
+                    page.Margin(2, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(12));
 
-            return NoContent();
-        }
+                    page.Header()
+                        .Text($"Certificado de Votación - {certificado.EventoElectoral.Nombre}")
+                        .SemiBold().FontSize(20).FontColor(Colors.Blue.Medium);
 
-        // POST: api/Certificados
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Certificado>> PostCertificado(Certificado certificado)
-        {
-            _context.Certificados.Add(certificado);
-            await _context.SaveChangesAsync();
+                    page.Content()
+                        .PaddingVertical(1, Unit.Centimetre)
+                        .Column(x =>
+                        {
+                            x.Item().Text("Certificamos que el estudiante:");
+                            x.Item().Text(certificado.Usuario.Nombres).Bold().FontSize(18).AlignCenter();
+                            x.Item().PaddingTop(10).Text($"Cédula: {certificado.Usuario.Cedula}");
+                            x.Item().Text($"Ha ejercido su derecho al voto.");
+                            x.Item().Text($"Fecha: {certificado.FechaEmision.ToString("dd/MM/yyyy HH:mm")}");
 
-            return CreatedAtAction("GetCertificado", new { id = certificado.Id }, certificado);
-        }
 
-        // DELETE: api/Certificados/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCertificado(int id)
-        {
-            var certificado = await _context.Certificados.FindAsync(id);
-            if (certificado == null)
-            {
-                return NotFound();
-            }
+                            x.Item().PaddingTop(40).AlignCenter().Text("___________________________");
+                            x.Item().AlignCenter().Text("Junta Electoral Universitaria");
+                        });
 
-            _context.Certificados.Remove(certificado);
-            await _context.SaveChangesAsync();
+                    page.Footer().AlignCenter().Text(x => { x.CurrentPageNumber(); });
+                });
+            });
 
-            return NoContent();
-        }
-
-        private bool CertificadoExists(int id)
-        {
-            return _context.Certificados.Any(e => e.Id == id);
+            byte[] archivoBytes = documento.GeneratePdf();
+            return File(archivoBytes, "application/pdf", $"Certificado_{cedula}.pdf");
         }
     }
 }

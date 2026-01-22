@@ -22,6 +22,7 @@ namespace SistemaVoto.Modelos
         public string Correo { get; set; }
         public string Clave { get; set; }
         public bool YaVoto { get; set; } // Estado
+        public string? TokenVotacion { get; set; } // El código temporal (ej: "A1B2")
 
         // FK
         public int RolUsuarioId { get; set; }

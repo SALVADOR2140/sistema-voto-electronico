@@ -211,12 +211,21 @@ namespace SistemaVotoElectronico.Api.Migrations
                     b.Property<int>("RolUsuarioId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("TokenVotacion")
+                        .HasColumnType("text");
+
                     b.Property<bool>("YaVoto")
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Cedula")
+                        .IsUnique();
+
                     b.HasIndex("RolUsuarioId");
+
+                    b.HasIndex("TokenVotacion")
+                        .IsUnique();
 
                     b.ToTable("Usuarios");
                 });

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotoElectronico.Api.Migrations
 {
     [DbContext(typeof(SistemaVotoElectronicoApiContext))]
-    [Migration("20260121174301_v1")]
+    [Migration("20260122034855_v1")]
     partial class v1
     {
         /// <inheritdoc />
@@ -214,12 +214,21 @@ namespace SistemaVotoElectronico.Api.Migrations
                     b.Property<int>("RolUsuarioId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("TokenVotacion")
+                        .HasColumnType("text");
+
                     b.Property<bool>("YaVoto")
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Cedula")
+                        .IsUnique();
+
                     b.HasIndex("RolUsuarioId");
+
+                    b.HasIndex("TokenVotacion")
+                        .IsUnique();
 
                     b.ToTable("Usuarios");
                 });

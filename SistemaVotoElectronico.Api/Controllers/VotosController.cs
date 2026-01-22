@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVoto.Modelos;
-using SistemaVotoElectronico.Api.Controllers;
-
 
 namespace SistemaVotoElectronico.Api.Controllers
 {
@@ -22,57 +15,54 @@ namespace SistemaVotoElectronico.Api.Controllers
             _context = context;
         }
 
-        // DTO: Clase auxiliar para recibir solo lo necesario
         public class IntencionVoto
         {
-            public int UsuarioId { get; set; }
+            public string Token { get; set; }
             public int EventoId { get; set; }
             public int? ListaId { get; set; }
         }
 
-        // POST: api/Votos/Emitir
         [HttpPost("Emitir")]
         public async Task<IActionResult> EmitirVoto([FromBody] IntencionVoto datos)
         {
-            var usuario = await _context.Usuarios.FindAsync(datos.UsuarioId);
-            if (usuario == null) return BadRequest("Usuario no encontrado.");
-            if (usuario.YaVoto) return BadRequest("Este usuario ya sufragó.");
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.TokenVotacion == datos.Token);
+
+            if (usuario == null) return Unauthorized("Token no válido.");
+            if (usuario.YaVoto) return BadRequest("El usuario ya registró su voto.");
 
             var evento = await _context.EventosElectorales.FindAsync(datos.EventoId);
-            if (evento == null || !evento.Activo) return BadRequest("La elección no está activa.");
+            if (evento == null || !evento.Activo) return BadRequest("El evento electoral no está activo.");
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 var voto = new Voto
                 {
-                    Fecha = DateTime.Now,
-
+                    Fecha = DateTime.UtcNow,
                     EventoElectoralId = datos.EventoId,
-
                     ListaPoliticaId = datos.ListaId,
-
                     HashSeguridad = Guid.NewGuid().ToString()
                 };
+                _context.Votos.Add(voto);
 
                 var certificado = new Certificado
                 {
-                    UsuarioId = datos.UsuarioId,
+                    UsuarioId = usuario.Id,
                     EventoElectoralId = datos.EventoId,
-                    FechaEmision = DateTime.Now,
-                    CodigoQR = Guid.NewGuid().ToString() 
+                    FechaEmision = DateTime.UtcNow,
+                    CodigoQR = Guid.NewGuid().ToString()
                 };
                 _context.Certificados.Add(certificado);
 
                 usuario.YaVoto = true;
+                usuario.TokenVotacion = null;
                 _context.Entry(usuario).State = EntityState.Modified;
 
- 
                 if (datos.ListaId.HasValue)
                 {
                     var resultado = await _context.ResultadosElecciones
-                        .FirstOrDefaultAsync(r => r.EventoElectoralId == datos.EventoId
-                                               && r.ListaPoliticaId == datos.ListaId.Value);
+                        .FirstOrDefaultAsync(r => r.EventoElectoralId == datos.EventoId && r.ListaPoliticaId == datos.ListaId);
 
                     if (resultado == null)
                     {
@@ -94,17 +84,12 @@ namespace SistemaVotoElectronico.Api.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return Ok(new
-                {
-                    mensaje = "Voto registrado con éxito",
-                    codigoCertificado = certificado.CodigoQR
-                });
+                return Ok(new { mensaje = "Voto registrado exitosamente." });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
-                var errorReal = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-                return StatusCode(500, "ERROR CRÍTICO: " + errorReal);
+                return StatusCode(500, "Error al procesar la solicitud.");
             }
         }
     }
