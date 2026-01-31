@@ -1,8 +1,41 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-5">
+    <h1 class="display-3 fw-bold text-primary">Sistema de Voto Electrónico</h1>
+    <h2 class="text-secondary mb-4">Elecciones 2026</h2>
+
+    <img src="https://cdn-icons-png.flaticon.com/512/2633/2633302.png" alt="Urna Electoral" width="150" class="mb-4" />
+
+    <p class="lead">
+        Bienvenido a la plataforma oficial de sufragio digital.
+        <br />
+        Garantizamos un proceso transparente, seguro y rápido.
+    </p>
+
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+        <a href="/EventosElectorales" class="btn btn-primary btn-lg px-4 gap-3">
+            <i class="fa-solid fa-check-to-slot"></i> Ver Elecciones Activas
+        </a>
+
+        <button type="button" class="btn btn-outline-secondary btn-lg px-4">
+            Consultar Resultados
+        </button>
+    </div>
+</div>
+
+<div class="row mt-5 pt-5 border-top">
+    <div class="col-md-4 text-center">
+        <h3>🔒 Seguro</h3>
+        <p>Sus datos están protegidos con los más altos estándares de encriptación.</p>
+    </div>
+    <div class="col-md-4 text-center">
+        <h3>⚡ Rápido</h3>
+        <p>Ejerza su derecho al voto en menos de 1 minuto desde cualquier lugar.</p>
+    </div>
+    <div class="col-md-4 text-center">
+        <h3>📊 Transparente</h3>
+        <p>Resultados verificables y actualizados en tiempo real al cerrar las urnas.</p>
+    </div>
 </div>

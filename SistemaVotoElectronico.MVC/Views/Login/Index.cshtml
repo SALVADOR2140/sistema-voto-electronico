@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = null; 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Sistema Voto</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-login {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-login text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/2633/2633302.png" width="80" class="mb-3" alt="Logo" />
+        <h3 class="mb-4">Acceso al Sistema</h3>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <form action="/Login/Entrar" method="post">
+            <div class="form-floating mb-3">
+                <input type="text" name="usuario" class="form-control" id="user" placeholder="Usuario" required>
+                <label for="user">Usuario</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" name="clave" class="form-control" id="pass" placeholder="Contraseña" required>
+                <label for="pass">Contraseña</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 btn-lg">Ingresar</button>
+        </form>
+
+        <div class="mt-3 text-muted">
+            <small>Credenciales de prueba: admin / 1234</small>
+        </div>
+    </div>
+
+</body>
+</html>

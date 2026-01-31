@@ -14,7 +14,6 @@ namespace SistemaVotoElectronico.Api.Controllers
             _context = context;
         }
 
-        // DTO para Login Administrativo
         public class LoginDto
         {
             public string Correo { get; set; }

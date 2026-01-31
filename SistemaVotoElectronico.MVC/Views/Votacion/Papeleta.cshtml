@@ -1,0 +1,50 @@
+﻿@model IEnumerable<SistemaVoto.Modelos.Candidato>
+
+@{
+    ViewData["Title"] = "Papeleta Electoral";
+    int eventoId = ViewBag.EventoId;
+}
+
+<div class="container">
+    <div class="text-center mb-5">
+        <h2 class="display-5">Elija su Candidato</h2>
+        <p class="text-muted">Su voto es secreto y seguro.</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        @foreach (var candidato in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow border-2 hover-effect">
+                    <img src="@candidato.FotoUrl" class="card-img-top p-3 rounded-circle mx-auto d-block" alt="@candidato.Nombres" style="width: 180px; height: 180px; object-fit: cover;">
+
+                    <div class="card-body text-center">
+                        <h4 class="card-title fw-bold">@candidato.Nombres</h4>
+                        <h5 class="text-primary">@candidato.Cargo</h5>
+                        <span class="badge bg-secondary mb-3">Lista @candidato.ListaPoliticaId</span>
+
+                        <br />
+                        <a href="@candidato.PlanGobiernoUrl" target="_blank" class="btn btn-link btn-sm">Ver Plan de Gobierno</a>
+                    </div>
+
+                    <div class="card-footer bg-white border-top-0 pb-4 text-center">
+                        <form asp-action="Votar" method="post">
+
+                            <input type="hidden" name="idLista" value="@candidato.ListaPoliticaId" />
+
+                            <input type="hidden" name="idEvento" value="@eventoId" />
+
+                            <button type="submit" class="btn btn-outline-primary btn-lg w-100" onclick="return confirm('¿Está seguro de votar por la Lista @candidato.ListaPoliticaId?');">
+                                Votar por este <i class="fa-solid fa-check"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="mt-4 text-center">
+        <a asp-action="Index" class="btn btn-secondary">Volver / Cancelar</a>
+    </div>
+</div>

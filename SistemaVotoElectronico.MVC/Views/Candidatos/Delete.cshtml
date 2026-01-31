@@ -1,0 +1,22 @@
+﻿@model SistemaVoto.Modelos.Candidato
+
+@{
+    ViewData["Title"] = "Eliminar Candidato";
+}
+
+<h1 class="text-danger">Eliminar Candidato</h1>
+
+<h3>¿Estás seguro que quieres eliminar este registro?</h3>
+<div class="card border-danger mt-3 mb-3" style="max-width: 500px;">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Nombres</h5>
+        <p class="card-text">ID de Registro: @Model.Id</p>
+    </div>
+</div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id" />
+
+    <input type="submit" value="Sí, Eliminar" class="btn btn-danger" />
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

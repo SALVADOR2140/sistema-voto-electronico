@@ -1,0 +1,52 @@
+﻿@model IEnumerable<SistemaVoto.Modelos.EventoElectoral>
+
+@{
+    ViewData["Title"] = "Centro de Votación";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-4">🗳️ Centro de Votación</h1>
+    <p class="lead">Seleccione una elección activa para participar</p>
+</div>
+
+@if (TempData["MensajeVoto"] != null)
+{
+    <div class="alert alert-success text-center">
+        <h2>✅ @TempData["MensajeVoto"]</h2>
+        <p>Gracias por ejercer su derecho.</p>
+    </div>
+}
+
+<div class="row justify-content-center">
+    @if (Model.Count() == 0)
+    {
+        <div class="col-md-6">
+            <div class="alert alert-warning text-center">
+                No hay elecciones activas en este momento.
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-md-5 mb-4">
+                <div class="card shadow border-primary h-100">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="m-0">ELECCIÓN OFICIAL</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@item.Nombre</h3>
+                        <p class="text-muted">
+                            Cierre: @item.FechaFin.ToString("dd/MMM HH:mm")
+                        </p>
+                        <hr />
+                        <a href="@Url.Action("Papeleta", new { idEvento = item.Id })" class="btn btn-success btn-lg w-100">
+                            <i class="fa-solid fa-person-booth"></i> ENTRAR AL CUARTO OSCURO
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

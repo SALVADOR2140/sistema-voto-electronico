@@ -32,18 +32,14 @@ public DbSet<SistemaVoto.Modelos.Voto> Votos { get; set; } = default!;
     {
         base.OnModelCreating(modelBuilder);
 
-        // --- REGLA 1: La Cédula NO puede repetirse (Tu pedido) ---
         modelBuilder.Entity<Usuario>()
             .HasIndex(u => u.Cedula)
             .IsUnique();
 
-        // --- REGLA 2: El Token de Votación también debería ser único ---
-        // Para evitar que por un error cósmico se generen dos tokens iguales
         modelBuilder.Entity<Usuario>()
             .HasIndex(u => u.TokenVotacion)
             .IsUnique();
 
-        // --- REGLA 3: Configuración para Voto en Blanco (Opcional) ---
         modelBuilder.Entity<Voto>()
             .HasOne(v => v.ListaPolitica)
             .WithMany()

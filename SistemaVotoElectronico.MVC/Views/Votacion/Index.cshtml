@@ -1,0 +1,61 @@
+﻿@model IEnumerable<SistemaVoto.Modelos.EventoElectoral>
+
+@{
+    ViewData["Title"] = "Centro de Votación";
+}
+
+<div class="text-center mb-5 mt-4">
+    <h1 class="display-4 fw-bold">🗳️ Centro de Votación</h1>
+    <p class="lead">Seleccione una elección activa para emitir su voto</p>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <h3>🛑 ALGO SALIÓ MAL:</h3>
+        <p>@TempData["Error"]</p>
+    </div>
+}
+
+@if (TempData["MensajeVoto"] != null)
+{
+    <div class="alert alert-success">
+        <h3>✅ ÉXITO:</h3>
+        <p>@TempData["MensajeVoto"]</p>
+    </div>
+}
+
+<div class="row justify-content-center">
+    @if (!Model.Any())
+    {
+        <div class="col-md-6">
+            <div class="alert alert-warning text-center shadow-sm">
+                <h4><i class="fa-solid fa-triangle-exclamation"></i> No hay elecciones activas</h4>
+                <p>Por favor, espere a que el administrador habilite un nuevo evento.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-md-5 mb-4">
+                <div class="card shadow-lg border-0 h-100">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h5 class="m-0 fw-bold">ELECCIÓN OFICIAL</h5>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        <h3 class="card-title text-primary">@item.Nombre</h3>
+                        <p class="text-muted">
+                            <i class="fa-regular fa-clock"></i> Cierre: @item.FechaFin.ToString("dd/MMM HH:mm")
+                        </p>
+                        <hr />
+                        <a href="@Url.Action("Papeleta", "Votacion", new { idEvento = item.Id })" class="btn btn-success btn-lg w-100 rounded-pill">
+                            ENTRAR AL CUARTO OSCURO <i class="fa-solid fa-person-booth ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

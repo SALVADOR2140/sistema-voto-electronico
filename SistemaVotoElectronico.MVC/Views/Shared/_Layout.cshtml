@@ -20,11 +20,40 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Administración
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-controller="EventosElectorales" asp-action="Index">Gestionar Eventos</a></li>
+                                <li><a class="dropdown-item" asp-controller="Candidatos" asp-action="Index">Gestionar Candidatos</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">Reportes</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-primary fw-bold" asp-controller="AccesoVotante" asp-action="Login">
+                                🗳️ Ir a Votar
+                            </a>
                         </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @if (Context.Session.GetString("UsuarioLogueado") != null)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark">
+                                    Hola, <b>@Context.Session.GetString("UsuarioLogueado")</b>
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-outline-danger btn-sm mt-1 ms-2" asp-controller="Login" asp-action="Salir">
+                                    Cerrar Sesión <i class="fa-solid fa-right-from-bracket"></i>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

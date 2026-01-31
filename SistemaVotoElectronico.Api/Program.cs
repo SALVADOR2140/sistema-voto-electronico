@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Newtonsoft.Json;
 
 namespace SistemaVotoElectronico.Api
 {
@@ -7,36 +8,42 @@ namespace SistemaVotoElectronico.Api
     {
         public static void Main(string[] args)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             var builder = WebApplication.CreateBuilder(args);
+
+            // 1. Configurar Serilog (Simple)
+            Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+            builder.Host.UseSerilog();
+
+            // 2. CONEXIÓN A BASE DE DATOS (Usando el nombre exacto del JSON)
+            var connectionString = builder.Configuration.GetConnectionString("CadenaPostgres");
+
             builder.Services.AddDbContext<SistemaVotoElectronicoApiContext>(options =>
-            //options.UseSqlServer(builder.Configuration.GetConnectionString("SistemaVotoElectronicoApiContext") ?? throw new InvalidOperationException("Connection string 'SistemaVotoElectronicoApiContext' not found.")));
-            options.UseNpgsql(builder.Configuration.GetConnectionString("SistemaVotoElectronicoApiContext.postgresql") ?? throw new InvalidOperationException("Connection string 'SistemaVotoElectronicoApiContext' not found.")));
+            {
+                options.UseNpgsql(connectionString);
+            });
 
+            // 3. Configuración básica de controladores
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            );
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Configuración de licencia para QuestPDF (Gratis para estudiantes)
+            // Licencia PDF (Opcional, para que no de error si lo tienes)
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // 4. Pipeline
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

@@ -12,10 +12,9 @@ namespace SistemaVoto.Modelos
         [Key]
         public int Id { get; set; }
 
-        public int TotalVotos { get; set; } // Cantidad de votos obtenidos
+        public int TotalVotos { get; set; }
 
-        // Opcional: Podrías guardar el % aquí si quieres evitar calcularlo en el front
-        // public decimal Porcentaje { get; set; } 
+
 
         // FK
         public int EventoElectoralId { get; set; }

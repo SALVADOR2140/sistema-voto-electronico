@@ -15,11 +15,11 @@ namespace SistemaVoto.Modelos
         public int Id { get; set; }
 
         public DateTime Fecha { get; set; }
-        public string HashSeguridad { get; set; } // SHA-256
+        public string HashSeguridad { get; set; }
 
         // FK
         public int EventoElectoralId { get; set; }
-        public int? ListaPoliticaId { get; set; } // Puede ser nulo (Voto Blanco)
+        public int? ListaPoliticaId { get; set; } 
 
         // Navegacion
         public EventoElectoral? EventoElectoral { get; set; }

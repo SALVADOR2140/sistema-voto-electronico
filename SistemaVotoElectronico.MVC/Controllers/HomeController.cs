@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using SistemaVotoElectronico.MVC.Filtros;
 using SistemaVotoElectronico.MVC.Models;
 using System.Diagnostics;
 
 namespace SistemaVotoElectronico.MVC.Controllers
 {
+    [VerificarSesion] 
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

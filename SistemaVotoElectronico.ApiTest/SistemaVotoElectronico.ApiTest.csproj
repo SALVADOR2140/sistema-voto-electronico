@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SistemaVotoElectronico.ApiConsumer\SistemaVotoElectronico.ApiConsumer.csproj" />
+    <ProjectReference Include="..\SistemaVotoElectronico\SistemaVotoElectronico.Modelos.csproj" />
+  </ItemGroup>
+
 </Project>

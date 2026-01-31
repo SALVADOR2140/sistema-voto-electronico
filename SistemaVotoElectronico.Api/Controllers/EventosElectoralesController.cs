@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaVoto.Modelos;
+using SistemaVotoElectronico.Modelos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SistemaVotoElectronico.Api.Controllers
 {
@@ -22,23 +23,25 @@ namespace SistemaVotoElectronico.Api.Controllers
 
         // GET: api/EventosElectorales
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EventoElectoral>>> GetEventoElectoral()
+        public async Task<ActionResult<ApiResult<List<EventoElectoral>>>> GetEventosElectorales()
         {
-            return await _context.EventosElectorales.ToListAsync();
+            var lista = await _context.EventosElectorales.ToListAsync();
+
+            return Ok(ApiResult<List<EventoElectoral>>.Ok(lista));
         }
 
         // GET: api/EventosElectorales/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<EventoElectoral>> GetEventoElectoral(int id)
+        public async Task<ActionResult<ApiResult<EventoElectoral>>> GetEventoElectoral(int id)
         {
             var eventoElectoral = await _context.EventosElectorales.FindAsync(id);
 
             if (eventoElectoral == null)
             {
-                return NotFound();
+                return NotFound(ApiResult<EventoElectoral>.Fail("No encontrado"));
             }
 
-            return eventoElectoral;
+            return Ok(ApiResult<EventoElectoral>.Ok(eventoElectoral));
         }
 
         // PUT: api/EventosElectorales/5
@@ -75,12 +78,12 @@ namespace SistemaVotoElectronico.Api.Controllers
         // POST: api/EventosElectorales
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<EventoElectoral>> PostEventoElectoral(EventoElectoral eventoElectoral)
+        public async Task<ActionResult<ApiResult<EventoElectoral>>> PostEventoElectoral(EventoElectoral eventoElectoral)
         {
             _context.EventosElectorales.Add(eventoElectoral);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEventoElectoral", new { id = eventoElectoral.Id }, eventoElectoral);
+            return Ok(ApiResult<EventoElectoral>.Ok(eventoElectoral));
         }
 
         // DELETE: api/EventosElectorales/5

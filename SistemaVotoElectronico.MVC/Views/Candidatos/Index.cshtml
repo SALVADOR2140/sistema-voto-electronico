@@ -1,0 +1,43 @@
+﻿@model IEnumerable<SistemaVoto.Modelos.Candidato>
+
+@{
+    ViewData["Title"] = "Gestión de Candidatos";
+}
+
+<h1>Gestión de Candidatos</h1>
+
+@if (TempData["MensajeExito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-check-circle"></i> @TempData["MensajeExito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Registrar Nuevo Candidato</a>
+</p>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="card-img-top p-3" alt="Foto Candidato" style="height: 200px; object-fit: contain;">
+
+                <div class="card-body text-center">
+                    <h5 class="card-title">@item.Nombres</h5>
+                    <p class="card-text text-muted">ID: @item.Id</p>
+                    <span class="badge bg-info text-dark">Partido / Movimiento</span>
+                </div>
+
+                <div class="card-footer bg-transparent border-top-0 text-center pb-3">
+                    <div class="btn-group" role="group">
+                        @Html.ActionLink("Editar", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-warning btn-sm" })
+                        @Html.ActionLink("Eliminar", "Delete", new { id = item.Id }, new { @class = "btn btn-outline-danger btn-sm" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
