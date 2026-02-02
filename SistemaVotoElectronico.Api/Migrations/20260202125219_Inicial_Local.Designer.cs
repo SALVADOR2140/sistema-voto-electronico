@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotoElectronico.Api.Migrations
 {
     [DbContext(typeof(SistemaVotoElectronicoApiContext))]
-    [Migration("20260129041317_v1")]
-    partial class v1
+    [Migration("20260202125219_Inicial_Local")]
+    partial class Inicial_Local
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,7 +74,7 @@ namespace SistemaVotoElectronico.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("FechaEmision")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("integer");
@@ -100,10 +100,10 @@ namespace SistemaVotoElectronico.Api.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("FechaFin")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -245,7 +245,7 @@ namespace SistemaVotoElectronico.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("Fecha")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("HashSeguridad")
                         .IsRequired()

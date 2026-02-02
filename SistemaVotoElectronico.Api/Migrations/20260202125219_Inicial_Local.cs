@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotoElectronico.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class v1 : Migration
+    public partial class Inicial_Local : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,8 +19,8 @@ namespace SistemaVotoElectronico.Api.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Nombre = table.Column<string>(type: "text", nullable: false),
-                    FechaInicio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    FechaFin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaInicio = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    FechaFin = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Activo = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -144,7 +144,7 @@ namespace SistemaVotoElectronico.Api.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Fecha = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Fecha = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     HashSeguridad = table.Column<string>(type: "text", nullable: false),
                     EventoElectoralId = table.Column<int>(type: "integer", nullable: false),
                     ListaPoliticaId = table.Column<int>(type: "integer", nullable: true)
@@ -172,7 +172,7 @@ namespace SistemaVotoElectronico.Api.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CodigoQR = table.Column<string>(type: "text", nullable: false),
-                    FechaEmision = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaEmision = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UsuarioId = table.Column<int>(type: "integer", nullable: false),
                     EventoElectoralId = table.Column<int>(type: "integer", nullable: false)
                 },

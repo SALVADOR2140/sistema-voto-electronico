@@ -71,7 +71,7 @@ namespace SistemaVotoElectronico.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("FechaEmision")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("integer");
@@ -97,10 +97,10 @@ namespace SistemaVotoElectronico.Api.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("FechaFin")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -242,7 +242,7 @@ namespace SistemaVotoElectronico.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("Fecha")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("HashSeguridad")
                         .IsRequired()

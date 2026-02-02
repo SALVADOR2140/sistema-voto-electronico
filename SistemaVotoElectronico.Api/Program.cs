@@ -15,8 +15,22 @@ namespace SistemaVotoElectronico.Api
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             builder.Host.UseSerilog();
 
-            // 2. CONEXIÓN A BASE DE DATOS (Usando el nombre exacto del JSON)
+            //// 2. CONEXIÓN A BASE DE DATOS (Usando el nombre exacto del JSON)
+            //var connectionString = builder.Configuration.GetConnectionString("CadenaPostgres");
+
+            //builder.Services.AddDbContext<SistemaVotoElectronicoApiContext>(options =>
+            //{
+            //    options.UseNpgsql(connectionString);
+            //});
+
+            // 2. CONEXIÓN A BASE DE DATOS
             var connectionString = builder.Configuration.GetConnectionString("CadenaPostgres");
+
+            // Agregamos esta validación para que la consola no se pierda
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new Exception("No se encontró la CadenaPostgres en appsettings.json");
+            }
 
             builder.Services.AddDbContext<SistemaVotoElectronicoApiContext>(options =>
             {
