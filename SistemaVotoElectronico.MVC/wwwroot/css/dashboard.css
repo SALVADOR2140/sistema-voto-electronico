@@ -1,0 +1,95 @@
+﻿/* wwwroot/css/dashboard.css */
+
+body {
+    background-color: #f3f4f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+    margin: 0; /* Aseguramos que no haya márgenes extraños */
+}
+
+/* --- BARRA LATERAL (SIDEBAR) --- */
+.sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    position: fixed; /* Fijo a la izquierda */
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    /* Espacio superior para no chocar con la barra azul */
+    padding-top: 80px;
+}
+
+    .sidebar .nav-link {
+        color: #6b7280;
+        padding: 15px 25px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+    }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: #f0f9ff;
+            color: #0284c7;
+            border-right: 4px solid #0284c7;
+        }
+
+        .sidebar .nav-link i {
+            width: 25px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+/* --- BARRA SUPERIOR (TOPBAR) --- */
+.topbar {
+    height: 80px; /* Altura corregida */
+    background: #4f46e5;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    /* ESTO ES LO IMPORTANTE PARA QUE NO SE BAJE */
+    position: fixed;
+    top: 0; /* Pegado al techo */
+    left: 0; /* Pegado a la izquierda */
+    width: 100%; /* Ancho total */
+    z-index: 1001; /* Por encima de todo */
+
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logo-text {
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+/* --- CONTENIDO PRINCIPAL --- */
+.main-content {
+    margin-left: 250px; /* Deja espacio para el sidebar */
+    margin-top: 80px; /* Deja espacio para el topbar */
+    padding: 30px;
+    width: calc(100% - 250px);
+}
+
+/* --- TARJETAS --- */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+    border-left: 5px solid transparent;
+}
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }

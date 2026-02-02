@@ -1,75 +1,82 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SistemaVotoElectronico.MVC</title>
+    <title>@ViewData["Title"] - Sistema Voto Electrónico</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SistemaVotoElectronico.MVC.styles.css" asp-append-version="true" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SistemaVotoElectronico.MVC</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Administración
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-controller="EventosElectorales" asp-action="Index">Gestionar Eventos</a></li>
-                                <li><a class="dropdown-item" asp-controller="Candidatos" asp-action="Index">Gestionar Candidatos</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Reportes</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-primary fw-bold" asp-controller="AccesoVotante" asp-action="Login">
-                                🗳️ Ir a Votar
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav ms-auto">
-                        @if (Context.Session.GetString("UsuarioLogueado") != null)
-                        {
-                            <li class="nav-item">
-                                <span class="nav-link text-dark">
-                                    Hola, <b>@Context.Session.GetString("UsuarioLogueado")</b>
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <a class="btn btn-outline-danger btn-sm mt-1 ms-2" asp-controller="Login" asp-action="Salir">
-                                    Cerrar Sesión <i class="fa-solid fa-right-from-bracket"></i>
-                                </a>
-                            </li>
-                        }
-                    </ul>
+    <header class="topbar">
+        <div class="logo-text">
+            <i class="fa-solid fa-check-to-slot me-2"></i> ADMIN UTN
+        </div>
+
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                    <i class="fa-solid fa-user"></i>
                 </div>
-            </div>
-        </nav>
+                <span class="fw-bold d-none d-md-inline">
+                    @if (Context.Session.GetString("UsuarioLogueado") != null)
+                    {
+                        @Context.Session.GetString("UsuarioLogueado")
+                    }
+                    else
+                    {
+                        <text>Invitado</text>
+                    }
+                </span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenu">
+                <li><h6 class="dropdown-header">Mi Cuenta</h6></li>
+                <li><a class="dropdown-item" href="#">Perfil</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item text-danger" asp-controller="Login" asp-action="Salir">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i> Cerrar Sesión
+                    </a>
+                </li>
+            </ul>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+    <nav class="sidebar shadow-sm">
+        <div class="py-2">
+
+            <p class="text-uppercase text-muted small fw-bold px-4 mt-3 mb-2">Principal</p>
+            <a asp-controller="Home" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                <i class="fa-solid fa-gauge-high"></i> Dashboard
+            </a>
+
+            <p class="text-uppercase text-muted small fw-bold px-4 mt-4 mb-2">Administración</p>
+
+            <a asp-controller="EventosElectorales" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "EventosElectorales" ? "active" : "")">
+                <i class="fa-solid fa-calendar-check"></i> Gestionar Eventos
+            </a>
+
+            <a asp-controller="Candidatos" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Candidatos" ? "active" : "")">
+                <i class="fa-solid fa-user-tie"></i> Gestionar Candidatos
+            </a>
+
+            <p class="text-uppercase text-muted small fw-bold px-4 mt-4 mb-2">Accesos</p>
+            <a asp-controller="AccesoVotante" asp-action="Login" class="nav-link text-primary fw-bold">
+                <i class="fa-solid fa-box-open"></i> Ir a Votar
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        @RenderBody()
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - SistemaVotoElectronico.MVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
