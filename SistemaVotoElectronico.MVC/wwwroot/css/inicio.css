@@ -1,0 +1,61 @@
+﻿/* Ubicación: wwwroot/css/inicio.css */
+
+body {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+}
+
+.intro-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 3.5rem;
+    border-radius: 25px;
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 25px 30px -10px rgba(0, 0, 0, 0.4);
+}
+
+.icon-box {
+    color: #4f46e5;
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+}
+
+.btn-votar {
+    background: #4f46e5;
+    color: white;
+    font-size: 1.4rem;
+    padding: 18px 45px;
+    border-radius: 50px;
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+    border: none;
+}
+
+    .btn-votar:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px rgba(79, 70, 229, 0.4);
+        color: white;
+        background: #4338ca;
+    }
+
+.btn-admin {
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+    .btn-admin:hover {
+        text-decoration: underline;
+        color: #1f2937;
+    }

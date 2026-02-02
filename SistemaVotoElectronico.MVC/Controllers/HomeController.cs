@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SistemaVotoElectronico.MVC.Filtros;
 using SistemaVotoElectronico.MVC.Models;
 using System.Diagnostics;

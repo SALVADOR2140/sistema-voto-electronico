@@ -41,7 +41,7 @@ namespace SistemaVotoElectronico.MVC
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Login}/{action=Index}/{id?}"); // Que arranque en el Login
+                pattern: "{controller=Inicio}/{action=Index}/{id?}"); // Ahora arranca en la portada
 
             app.Run();
         }
