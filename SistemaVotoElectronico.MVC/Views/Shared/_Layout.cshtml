@@ -66,6 +66,10 @@
                 <i class="fa-solid fa-user-tie"></i> Gestionar Candidatos
             </a>
 
+            <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Usuarios" ? "active" : "")">
+                <i class="fa-solid fa-users-gear"></i> Gestionar Votantes
+            </a>
+
         </div>
     </nav>
 

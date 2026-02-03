@@ -1,0 +1,82 @@
+﻿@model IEnumerable<SistemaVoto.Modelos.Usuario>
+
+@{
+    ViewData["Title"] = "Padrón Electoral";
+}
+
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">
+            <i class="fa-solid fa-users-viewfinder me-2"></i> Padrón de Votantes
+        </h2>
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="fa-solid fa-user-plus me-1"></i> Registrar Nuevo Votante
+        </a>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4">Cédula</th>
+                            <th>Nombres</th>
+                            <th>Correo</th>
+                            <th>Token de Votación</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-secondary">@item.Cedula</td>
+                                <td>@item.Nombres</td>
+                                <td><small class="text-muted">@item.Correo</small></td>
+                                <td>
+                                    <span class="badge bg-light text-primary border border-primary">
+                                        <i class="fa-solid fa-key me-1 small"></i> @item.TokenVotacion
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    @if (item.YaVoto)
+                                    {
+                                        <span class="badge rounded-pill bg-success">
+                                            <i class="fa-solid fa-check-circle me-1"></i> Votó
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill bg-warning text-dark">
+                                            <i class="fa-solid fa-clock me-1"></i> Pendiente
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="Detalles">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3 text-muted small">
+        <i class="fa-solid fa-circle-info me-1"></i>
+        Mostrando @Model.Count() votantes registrados en la base de datos local.
+    </div>
+</div>
