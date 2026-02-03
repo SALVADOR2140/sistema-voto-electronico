@@ -16,18 +16,18 @@ namespace SistemaVotoElectronico.MVC
 
             var builder = WebApplication.CreateBuilder(args);
 
-            // ==============================================================
+
             // 1. REGISTRAR EL CONTEXTO DE LA BASE DE DATOS (Solución al Error)
-            // ==============================================================
+
             builder.Services.AddDbContext<SistemaVotoElectronicoApiContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("CadenaPostgres")));
 
-            // ==============================================================
+
             // 2. CONFIGURACIÓN DE SESIONES
-            // ==============================================================
+
             builder.Services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(20);
+                options.IdleTimeout = TimeSpan.FromHours(2); // 2 horas para mayor estabilidad en la defensa
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
@@ -47,9 +47,9 @@ namespace SistemaVotoElectronico.MVC
 
             app.UseRouting();
 
-            // ==============================================================
+
             // 3. MIDDLEWARES (Orden importante)
-            // ==============================================================
+
             app.UseSession(); // Debe ir antes de Authorization
             app.UseAuthorization();
 

@@ -1,0 +1,40 @@
+﻿@model SistemaVoto.Modelos.Usuario
+
+@{
+    ViewData["Title"] = "Token Generado";
+    // Vinculamos la vista con el diseño exclusivo sin barra lateral
+    Layout = "~/Views/Shared/_LayoutJunta.cshtml";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
+    <div class="card border-0 shadow-lg text-center" style="max-width: 500px; border-radius: 20px;">
+        <div class="card-header bg-success text-white py-3" style="border-radius: 20px 20px 0 0;">
+            <h4 class="mb-0"><i class="fa-solid fa-circle-check me-2"></i> Estudiante Validado</h4>
+        </div>
+
+        <div class="card-body p-5">
+            @* Información del Estudiante *@
+            <h5 class="text-muted mb-1">Nombres:</h5>
+            <h3 class="fw-bold text-dark">@Html.DisplayFor(model => model.Nombres)</h3>
+            <p class="text-secondary small">Cédula: @Html.DisplayFor(model => model.Cedula)</p>
+
+            <hr class="my-4">
+
+            @* Sección del Token Gigante generado por tu controlador *@
+            <p class="text-uppercase fw-bold text-primary small mb-2" style="letter-spacing: 1px;">Código para votar:</p>
+            <div class="bg-light py-4 rounded-3 border border-2 border-primary shadow-sm">
+                <h1 class="display-1 fw-bold text-primary mb-0" style="letter-spacing: 10px;">@Html.DisplayFor(model => model.TokenVotacion)</h1>
+            </div>
+
+            <div class="mt-5">
+                <a asp-action="Index" class="btn btn-primary btn-lg w-100 rounded-pill shadow">
+                    <i class="fa-solid fa-user-plus me-2"></i> Validar otro Estudiante
+                </a>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white border-0 pb-4 text-center">
+            <small class="text-muted">Entregue este código al estudiante para que proceda a la cabina de votación.</small>
+        </div>
+    </div>
+</div>

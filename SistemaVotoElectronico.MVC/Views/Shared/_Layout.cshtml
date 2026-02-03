@@ -51,24 +51,37 @@
     <nav class="sidebar shadow-sm">
         <div class="py-2">
 
-            <p class="text-uppercase text-muted small fw-bold px-4 mt-3 mb-2">Principal</p>
-            <a asp-controller="Home" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
-                <i class="fa-solid fa-gauge-high"></i> Dashboard
-            </a>
+            @* SECCIÓN PARA EL ADMIN (Rol 1) *@
+            @if (Context.Session.GetInt32("RolUsuarioId") == 1)
+            {
+                <p class="text-uppercase text-muted small fw-bold px-4 mt-3 mb-2">Principal</p>
+                <a asp-controller="Home" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                    <i class="fa-solid fa-gauge-high"></i> Dashboard
+                </a>
 
-            <p class="text-uppercase text-muted small fw-bold px-4 mt-4 mb-2">Administración</p>
+                <p class="text-uppercase text-muted small fw-bold px-4 mt-4 mb-2">Administración</p>
 
-            <a asp-controller="EventosElectorales" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "EventosElectorales" ? "active" : "")">
-                <i class="fa-solid fa-calendar-check"></i> Gestionar Eventos
-            </a>
+                <a asp-controller="EventosElectorales" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "EventosElectorales" ? "active" : "")">
+                    <i class="fa-solid fa-calendar-check"></i> Gestionar Eventos
+                </a>
 
-            <a asp-controller="Candidatos" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Candidatos" ? "active" : "")">
-                <i class="fa-solid fa-user-tie"></i> Gestionar Candidatos
-            </a>
+                <a asp-controller="Candidatos" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Candidatos" ? "active" : "")">
+                    <i class="fa-solid fa-user-tie"></i> Gestionar Candidatos
+                </a>
 
-            <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Usuarios" ? "active" : "")">
-                <i class="fa-solid fa-users-gear"></i> Gestionar Votantes
-            </a>
+                <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Usuarios" ? "active" : "")">
+                    <i class="fa-solid fa-users-gear"></i> Gestionar Votantes
+                </a>
+            }
+
+            @* SECCIÓN PARA EL JEFE DE JUNTA (Rol 3) *@
+            @if (Context.Session.GetInt32("RolUsuarioId") == 3)
+            {
+                <p class="text-uppercase text-muted small fw-bold px-4 mt-3 mb-2">Operaciones</p>
+                <a asp-controller="Juntas" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Juntas" ? "active" : "")">
+                    <i class="fa-solid fa-id-card-clip"></i> Mesa de Junta
+                </a>
+            }
 
         </div>
     </nav>

@@ -25,13 +25,27 @@ namespace SistemaVotoElectronico.MVC.Controllers
         [HttpPost]
         public IActionResult Entrar(string usuario, string clave)
         {
-            // Buscamos en la base de datos usando el contexto
-            var user = _context.Usuarios.FirstOrDefault(u => u.Cedula == usuario && u.Clave == clave);
+            // Buscamos al usuario en la base de datos
+            var user = _context.Usuarios
+                .FirstOrDefault(u => u.Cedula == usuario && u.Clave == clave);
 
             if (user != null)
             {
+                // Guardamos los datos esenciales en la sesión
                 HttpContext.Session.SetString("UsuarioLogueado", user.Nombres);
-                return RedirectToAction("Index", "Home");
+                HttpContext.Session.SetInt32("RolUsuarioId", user.RolUsuarioId);
+
+                // REDIRECCIÓN POR ROL
+                if (user.RolUsuarioId == 1) // Administrador
+                {
+                    return RedirectToAction("Index", "Home"); // Va al Dashboard con barra lateral
+                }
+                else if (user.RolUsuarioId == 3) // Jefe de Junta
+                {
+                    return RedirectToAction("Index", "Juntas"); // Va al buscador centrado
+                }
+
+                return RedirectToAction("Index", "Inicio");
             }
             else
             {
@@ -43,7 +57,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
         public IActionResult Salir()
         {
             HttpContext.Session.Clear(); // Borramos la memoria
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Login");
         }
     }
 }
