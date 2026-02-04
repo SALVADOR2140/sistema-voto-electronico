@@ -24,12 +24,10 @@
         <h1 class="fw-bold text-dark mb-3">Elecciones 2026</h1>
         <p class="text-muted mb-5">Bienvenido al sistema oficial. Pulse el botón para comenzar su proceso de votación.</p>
 
-        @* Botón principal para el estudiante *@
         <a asp-controller="AccesoVotante" asp-action="Login" class="btn-votar shadow-sm mb-4">
             <i class="fa-solid fa-fingerprint me-2"></i> IR A VOTAR
         </a>
 
-        @* Sección de accesos técnicos unificada *@
         <div class="mt-4 pt-3 border-top">
             <div class="d-flex justify-content-center gap-3">
                 <a asp-controller="Juntas" asp-action="Index" class="btn-admin text-decoration-none">

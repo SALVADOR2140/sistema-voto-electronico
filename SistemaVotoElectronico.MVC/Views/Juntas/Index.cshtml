@@ -2,21 +2,19 @@
 
 @{
     ViewData["Title"] = "Validación de Votantes";
-    // Cambiamos al Layout exclusivo del Jefe de Junta
     Layout = "~/Views/Shared/_LayoutJunta.cshtml";
 }
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="card shadow-lg border-0" style="width: 100%; max-width: 500px; border-radius: 15px;">
         <div class="card-header bg-primary text-white text-center py-4" style="border-radius: 15px 15px 0 0;">
-            <i class="fa-solid fa-id-card-clip fa-4x mb-3"></i> @* Icono más grande para destacar *@
+            <i class="fa-solid fa-id-card-clip fa-4x mb-3"></i> 
             <h3 class="fw-bold mb-0">Mesa de Junta</h3>
             <p class="small mb-0 opacity-75">Generación de Tokens de Votación</p>
         </div>
 
         <div class="card-body p-5">
             <form asp-action="GenerarToken" method="post">
-                @* Nombre de acción corregido *@
                 <div class="mb-4 text-center">
                     <label class="form-label fw-bold text-secondary text-uppercase small">Ingrese Número de Cédula</label>
                     <input type="text" name="cedula" class="form-control form-control-lg text-center shadow-sm"

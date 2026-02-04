@@ -36,13 +36,13 @@ namespace SistemaVotoElectronico.MVC.Controllers
                 HttpContext.Session.SetInt32("RolUsuarioId", user.RolUsuarioId);
 
                 // REDIRECCIÓN POR ROL
-                if (user.RolUsuarioId == 1) // Administrador
+                if (user.RolUsuarioId == 1) 
                 {
-                    return RedirectToAction("Index", "Home"); // Va al Dashboard con barra lateral
+                    return RedirectToAction("Index", "Home"); 
                 }
-                else if (user.RolUsuarioId == 3) // Jefe de Junta
+                else if (user.RolUsuarioId == 3) 
                 {
-                    return RedirectToAction("Index", "Juntas"); // Va al buscador centrado
+                    return RedirectToAction("Index", "Juntas"); 
                 }
 
                 return RedirectToAction("Index", "Inicio");
@@ -56,7 +56,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
         // Para cerrar sesión
         public IActionResult Salir()
         {
-            HttpContext.Session.Clear(); // Borramos la memoria
+            HttpContext.Session.Clear(); 
             return RedirectToAction("Index", "Login");
         }
     }

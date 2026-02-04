@@ -1,6 +1,6 @@
 using SistemaVoto.Modelos;
 using SistemaVotoElectronico.ApiConsumer;
-using Microsoft.EntityFrameworkCore; // Necesario para AddDbContext
+using Microsoft.EntityFrameworkCore; 
 
 namespace SistemaVotoElectronico.MVC
 {
@@ -50,7 +50,7 @@ namespace SistemaVotoElectronico.MVC
 
             // 3. MIDDLEWARES (Orden importante)
 
-            app.UseSession(); // Debe ir antes de Authorization
+            app.UseSession(); 
             app.UseAuthorization();
 
             app.MapControllerRoute(

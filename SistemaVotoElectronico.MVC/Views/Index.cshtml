@@ -2,27 +2,32 @@
 
 @{
     ViewData["Title"] = "Centro de Votación";
+    Layout = "~/Views/Shared/_LayoutVotante.cshtml";
 }
 
 <div class="text-center mb-5">
-    <h1 class="display-4">🗳️ Centro de Votación</h1>
-    <p class="lead">Seleccione una elección activa para participar</p>
+    <h1 class="display-4 fw-bold text-primary">🗳️ Centro de Votación</h1>
+    <p class="lead">Bienvenido. Seleccione la elección en la que desea participar.</p>
 </div>
 
 @if (TempData["MensajeVoto"] != null)
 {
-    <div class="alert alert-success text-center">
-        <h2>✅ @TempData["MensajeVoto"]</h2>
-        <p>Gracias por ejercer su derecho.</p>
+    <div class="alert alert-success shadow-sm text-center py-4">
+        <h2 class="fw-bold">✅ @TempData["MensajeVoto"]</h2>
+        <p class="mb-0">Su participación ha sido registrada con éxito. Gracias por votar.</p>
     </div>
 }
 
 <div class="row justify-content-center">
-    @if (Model.Count() == 0)
+    @if (!Model.Any())
     {
-        <div class="col-md-6">
-            <div class="alert alert-warning text-center">
-                No hay elecciones activas en este momento.
+        <div class="col-md-8">
+            <div class="card border-warning bg-light shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fa-solid fa-circle-exclamation fa-3x text-warning mb-3"></i>
+                    <h4 class="text-dark">No hay elecciones activas</h4>
+                    <p class="text-muted">Por favor, espere a que el administrador habilite un nuevo evento electoral.</p>
+                </div>
             </div>
         </div>
     }
@@ -30,19 +35,20 @@
     {
         @foreach (var item in Model)
         {
-            <div class="col-md-5 mb-4">
-                <div class="card shadow border-primary h-100">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h5 class="m-0">ELECCIÓN OFICIAL</h5>
+            <div class="col-md-6 col-lg-5 mb-4">
+                <div class="card shadow-lg border-0 h-100">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h5 class="m-0 fw-bold">PROCESO ELECTORAL OFICIAL</h5>
                     </div>
-                    <div class="card-body text-center">
-                        <h3 class="card-title">@item.Nombre</h3>
-                        <p class="text-muted">
-                            Cierre: @item.FechaFin.ToString("dd/MMM HH:mm")
+                    <div class="card-body text-center p-4">
+                        <h3 class="card-title text-dark fw-bold mb-3">@item.Nombre</h3>
+                        <p class="text-secondary mb-4">
+                            <i class="fa-regular fa-clock me-1"></i>
+                            Cierre: @item.FechaFin.ToString("dd/MM/yyyy HH:mm")
                         </p>
                         <hr />
-                        <a href="@Url.Action("Papeleta", new { idEvento = item.Id })" class="btn btn-success btn-lg w-100">
-                            <i class="fa-solid fa-person-booth"></i> ENTRAR AL CUARTO OSCURO
+                        <a href="@Url.Action("Papeleta", new { idEvento = item.Id })" class="btn btn-success btn-lg w-100 py-3 shadow-sm fw-bold">
+                            <i class="fa-solid fa-person-booth me-2"></i> ENTRAR AL CUARTO OSCURO
                         </a>
                     </div>
                 </div>
