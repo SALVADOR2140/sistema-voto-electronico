@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotoElectronico.Api.Migrations
 {
     [DbContext(typeof(SistemaVotoElectronicoApiContext))]
-    [Migration("20260202125219_Inicial_Local")]
-    partial class Inicial_Local
+    [Migration("20260205153219_PgV01")]
+    partial class PgV01
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

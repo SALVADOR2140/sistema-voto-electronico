@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SistemaVotoElectronico.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial_Local : Migration
+    public partial class PgV01 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
