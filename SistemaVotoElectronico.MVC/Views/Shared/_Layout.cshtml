@@ -51,7 +51,7 @@
     <nav class="sidebar shadow-sm">
         <div class="py-2">
 
-            @* SECCIÓN PARA EL ADMIN (Rol 1) *@
+            @* === SECCIÓN PARA EL ADMIN (Rol 1) === *@
             @if (Context.Session.GetInt32("RolUsuarioId") == 1)
             {
                 <p class="text-uppercase text-muted small fw-bold px-4 mt-3 mb-2">Principal</p>
@@ -69,13 +69,19 @@
                     <i class="fa-solid fa-user-tie"></i> Gestionar Candidatos
                 </a>
 
+                @* 👇 AQUÍ AGREGAMOS EL BOTÓN QUE FALTABA 👇 *@
+                <a asp-controller="Jefes" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Jefes" ? "active" : "")">
+                    <i class="fa-solid fa-user-shield"></i> Gestionar Jefes Junta
+                </a>
+
                 <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Usuarios" ? "active" : "")">
                     <i class="fa-solid fa-users-gear"></i> Gestionar Votantes
                 </a>
             }
 
-            @* SECCIÓN PARA EL JEFE DE JUNTA (Rol 3) *@
-            @if (Context.Session.GetInt32("RolUsuarioId") == 3)
+            @* === SECCIÓN PARA EL JEFE DE JUNTA (Rol 2) === *@
+            @* ⚠️ CORREGIDO: Antes tenías 3, pero el Jefe es 2 *@
+            @if (Context.Session.GetInt32("RolUsuarioId") == 2)
             {
                 <p class="text-uppercase text-muted small fw-bold px-4 mt-3 mb-2">Operaciones</p>
                 <a asp-controller="Juntas" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Juntas" ? "active" : "")">

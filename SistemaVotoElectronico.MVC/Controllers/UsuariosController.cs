@@ -21,10 +21,10 @@ namespace SistemaVotoElectronico.MVC.Controllers
         // GET: Usuarios
         public async Task<IActionResult> Index()
         {
-            // Filtramos para que solo aparezcan los usuarios con Rol ID 2 (Votantes)
+         
             var votantes = _context.Usuarios
                 .Include(u => u.RolUsuario)
-                .Where(u => u.RolUsuarioId == 2);
+                .Where(u => u.RolUsuarioId == 3);
 
             return View(await votantes.ToListAsync());
         }
@@ -56,15 +56,13 @@ namespace SistemaVotoElectronico.MVC.Controllers
         }
 
         // POST: Usuarios/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Cedula,Nombres,Correo,Clave,TokenVotacion")] Usuario usuario)
+        
+        public async Task<IActionResult> Create([Bind("Id,Cedula,Nombres,Correo,Clave,TokenVotacion,RolUsuarioId")] Usuario usuario)
         {
-            // Forzamos los valores automáticos para seguridad
-            usuario.RolUsuarioId = 2; // Siempre Votante
-            usuario.YaVoto = false;   // Nadie ha votado al ser creado
+
+            usuario.YaVoto = false;    // Nadie ha votado al ser creado
 
             if (ModelState.IsValid)
             {
@@ -72,6 +70,9 @@ namespace SistemaVotoElectronico.MVC.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+         
+            ViewData["RolUsuarioId"] = new SelectList(_context.RolUsuarios, "Id", "NombreRol", usuario.RolUsuarioId);
             return View(usuario);
         }
 

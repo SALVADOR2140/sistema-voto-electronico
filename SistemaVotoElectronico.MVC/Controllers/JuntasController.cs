@@ -19,7 +19,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
             _context = context;
         }
 
-        private bool EsJefeDeJunta() => HttpContext.Session.GetInt32("RolUsuarioId") == 3;
+        private bool EsJefeDeJunta() => HttpContext.Session.GetInt32("RolUsuarioId") == 2;
 
         // GET: Juntas
         public IActionResult Index()
@@ -47,7 +47,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
 
             // Buscamos solo usuarios que sean Votantes (Rol 2)
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Cedula == cedula && u.RolUsuarioId == 2);
+                .FirstOrDefaultAsync(u => u.Cedula == cedula && u.RolUsuarioId == 3);
 
             if (usuario == null)
             {

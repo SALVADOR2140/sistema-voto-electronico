@@ -1,0 +1,79 @@
+﻿@model SistemaVoto.Modelos.Usuario
+
+@{
+    ViewData["Title"] = "Nuevo Jefe de Junta";
+}
+
+<div class="container mt-5">
+    <div class="card shadow border-0" style="max-width: 600px; margin: auto;">
+
+        @* Encabezado Azul *@
+        <div class="card-header bg-primary text-white text-center py-3">
+            <h4 class="mb-0 fw-bold">
+                <i class="fa-solid fa-user-shield me-2"></i>Registrar Jefe de Junta
+            </h4>
+        </div>
+
+        <div class="card-body p-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                @* Campo Cédula *@
+                <div class="form-group mb-3">
+                    <label asp-for="Cedula" class="form-label fw-bold">Número de Cédula (Usuario)</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                        <input asp-for="Cedula" class="form-control" placeholder="Ej: 1002003004" required />
+                    </div>
+                    <span asp-validation-for="Cedula" class="text-danger small"></span>
+                </div>
+
+                @* Campo Nombres *@
+                <div class="form-group mb-3">
+                    <label asp-for="Nombres" class="form-label fw-bold">Nombre Completo</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        <input asp-for="Nombres" class="form-control" placeholder="Ej: Roberto Gómez" required />
+                    </div>
+                    <span asp-validation-for="Nombres" class="text-danger small"></span>
+                </div>
+
+                @* Campo Correo *@
+                <div class="form-group mb-3">
+                    <label asp-for="Correo" class="form-label fw-bold">Correo Institucional</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                        <input asp-for="Correo" type="email" class="form-control" placeholder="nombre@utn.edu.ec" required />
+                    </div>
+                    <span asp-validation-for="Correo" class="text-danger small"></span>
+                </div>
+
+                @* Campo Clave *@
+                <div class="form-group mb-4">
+                    <label asp-for="Clave" class="form-label fw-bold">Contraseña de Acceso</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input asp-for="Clave" type="password" class="form-control" placeholder="******" required />
+                    </div>
+                    <span asp-validation-for="Clave" class="text-danger small"></span>
+                </div>
+
+                @* Botones de Acción *@
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fa-solid fa-save me-2"></i>Guardar Jefe
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Cancelar y Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

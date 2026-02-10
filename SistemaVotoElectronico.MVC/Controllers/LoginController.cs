@@ -6,10 +6,10 @@ namespace SistemaVotoElectronico.MVC.Controllers
     public class LoginController : Controller
     {
 
-        //AGREGAR ESTO: Declaración del contexto
+      
         private readonly SistemaVotoElectronicoApiContext _context;
 
-        //AGREGAR ESTO: Constructor que recibe el contexto
+       
         public LoginController(SistemaVotoElectronicoApiContext context)
         {
             _context = context;
@@ -21,31 +21,38 @@ namespace SistemaVotoElectronico.MVC.Controllers
             return View();
         }
 
-        // POST: Recibe los datos y valida
         [HttpPost]
         public IActionResult Entrar(string usuario, string clave)
         {
-            // Buscamos al usuario en la base de datos
+      
             var user = _context.Usuarios
                 .FirstOrDefault(u => u.Cedula == usuario && u.Clave == clave);
 
             if (user != null)
             {
-                // Guardamos los datos esenciales en la sesión
+                // 2. Guardamos datos en sesión (para que el sistema sepa quién es)
                 HttpContext.Session.SetString("UsuarioLogueado", user.Nombres);
                 HttpContext.Session.SetInt32("RolUsuarioId", user.RolUsuarioId);
 
-                // REDIRECCIÓN POR ROL
-                if (user.RolUsuarioId == 1) 
+                // 3. SEMÁFORO DE REDIRECCIÓN (Usando los nombres de TU captura)
+                switch (user.RolUsuarioId)
                 {
-                    return RedirectToAction("Index", "Home"); 
-                }
-                else if (user.RolUsuarioId == 3) 
-                {
-                    return RedirectToAction("Index", "Juntas"); 
-                }
+                    case 1: // Administrador
+                            // Lo enviamos al Home (que parece ser tu panel principal)
+                        return RedirectToAction("Index", "Home");
 
-                return RedirectToAction("Index", "Inicio");
+                    case 2: // Jefe de Junta
+                            // CORREGIDO: Usamos "Juntas" porque tu archivo es JuntasController.cs
+                        return RedirectToAction("Index", "Juntas");
+
+                    case 3: // Votante
+                            // Lo enviamos a votar. (Asumo que VotacionController tiene un Index o Papeleta)
+                        return RedirectToAction("Index", "Votacion");
+
+                    default:
+                        // Si algo falla, al inicio público
+                        return RedirectToAction("Index", "Inicio");
+                }
             }
             else
             {

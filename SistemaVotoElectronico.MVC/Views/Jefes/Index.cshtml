@@ -1,0 +1,74 @@
+﻿@model IEnumerable<SistemaVoto.Modelos.Usuario>
+
+@{
+    ViewData["Title"] = "Gestión de Jefes";
+}
+
+<div class="container mt-4">
+    @* Encabezado con Botón de Crear *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">
+            <i class="fa-solid fa-user-tie me-2"></i>Gestión de Jefes de Junta
+        </h2>
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="fa-solid fa-plus me-1"></i> Nuevo Jefe
+        </a>
+    </div>
+
+    @* Tarjeta con la Tabla *@
+    <div class="card shadow border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark text-uppercase small">
+                    <tr>
+                        <th class="ps-4">Cédula</th>
+                        <th>Nombres</th>
+                        <th>Correo Institucional</th>
+                        <th class="text-center">Rol Asignado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold text-secondary">
+                                @Html.DisplayFor(modelItem => item.Cedula)
+                            </td>
+                            <td class="fw-bold">
+                                @Html.DisplayFor(modelItem => item.Nombres)
+                            </td>
+                            <td>
+                                <i class="fa-regular fa-envelope text-muted me-1"></i>
+                                @Html.DisplayFor(modelItem => item.Correo)
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-warning text-dark border border-warning">
+                                    <i class="fa-solid fa-id-badge me-1"></i>Jefe de Mesa
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (!Model.Any())
+            {
+                <div class="text-center p-5 text-muted">
+                    <i class="fa-solid fa-users-slash fa-3x mb-3"></i>
+                    <p>No hay Jefes de Junta registrados aún.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
