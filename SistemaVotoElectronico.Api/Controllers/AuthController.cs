@@ -25,16 +25,17 @@ namespace SistemaVotoElectronico.Api.Controllers
         {
             var usuario = await _context.Usuarios
                 .Include(u => u.RolUsuario)
-                .FirstOrDefaultAsync(u => u.Correo == login.Correo);
+                .FirstOrDefaultAsync(u => u.Cedula == login.Correo);
 
-            if (usuario == null) return Unauthorized("Correo incorrecto.");
+            if (usuario == null) return Unauthorized("Cédula no encontrada.");
             if (usuario.Clave != login.Clave) return Unauthorized("Contraseña incorrecta.");
 
+            // Validar que no sea un Votante intentando entrar al panel administrativo
             if (usuario.RolUsuario.NombreRol == "Votante")
             {
-                return StatusCode(403, "ACCESO DENEGADO: Los votantes solo pueden ingresar en la Urna Electrónica con su Token.");
+                return StatusCode(403, "ACCESO DENEGADO: Los votantes ingresan por la Urna.");
             }
-      
+
             return Ok(new
             {
                 usuarioId = usuario.Id,
@@ -43,8 +44,6 @@ namespace SistemaVotoElectronico.Api.Controllers
                 tokenSesion = Guid.NewGuid().ToString()
             });
         }
-
-
         [HttpPost("LoginUrna")]
         public async Task<IActionResult> LoginUrna([FromBody] string token)
         {
@@ -54,10 +53,6 @@ namespace SistemaVotoElectronico.Api.Controllers
 
             if (usuario == null) return Unauthorized("Token inválido.");
 
-            if (usuario.RolUsuario.NombreRol != "Votante")
-            {
-                return BadRequest("El personal administrativo no puede votar en esta urna.");
-            }
 
             if (usuario.YaVoto) return BadRequest("Este token ya fue utilizado.");
 

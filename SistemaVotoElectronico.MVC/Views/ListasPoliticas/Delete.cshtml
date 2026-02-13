@@ -1,0 +1,56 @@
+﻿@model SistemaVoto.Modelos.ListaPolitica
+
+@{
+    ViewData["Title"] = "Eliminar Lista";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4 text-center">
+                <div class="card-header bg-danger text-white py-4">
+                    <i class="fa-solid fa-ban fa-4x mb-2"></i>
+                    <h3 class="fw-bold mb-0">¿Eliminar Lista?</h3>
+                </div>
+                <div class="card-body p-5">
+                    <img src="@Model.LogoUrl" class="img-fluid mb-3 rounded shadow-sm" style="max-height: 100px;">
+                    <h4 class="fw-bold">@Model.Nombre</h4>
+                    <p class="text-danger fw-bold small">⚠️ ATENCIÓN: Si elimina esta lista, se perderán los candidatos asociados.</p>
+
+                    <form asp-action="Delete" id="formEliminarLista">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="button" onclick="confirmarBorrado()" class="btn btn-danger btn-lg rounded-pill fw-bold">
+                                <i class="fa-solid fa-trash-can me-2"></i> Confirmar Eliminación
+                            </button>
+                            <a asp-action="Index" class="btn btn-light rounded-pill">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarBorrado() {
+            Swal.fire({
+                title: 'Seguridad de Administrador',
+                text: "Ingrese contraseña para eliminar la organización política:",
+                input: 'password',
+                showCancelButton: true,
+                confirmButtonText: 'Eliminar permanentemente',
+                confirmButtonColor: '#dc3545'
+            }).then((result) => {
+                if (result.isConfirmed && result.value === "1234") {
+                    document.getElementById('formEliminarLista').submit();
+                } else if (result.isConfirmed) {
+                    Swal.fire('Error', 'Contraseña incorrecta', 'error');
+                }
+            });
+        }
+    </script>
+}

@@ -2,67 +2,56 @@
 
 @{
     ViewData["Title"] = "Registrar Candidato";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Registrar Nuevo Candidato</h1>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-plus me-2"></i>Configurar Candidato</h5>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-action="Create" autocomplete="off">
 
-            <div class="form-group mb-3">
-                <label asp-for="Nombres" class="control-label">Nombres y Apellidos</label>
-                <input asp-for="Nombres" class="form-control" placeholder="Ej: Juan Pérez" />
-                <span asp-validation-for="Nombres" class="text-danger"></span>
-            </div>
+                        <div class="mb-4">
+                            <label asp-for="Nombres" class="form-label fw-bold">Nombres Completos</label>
+                            <input asp-for="Nombres" class="form-control" placeholder="Ej: Juan Pérez" required />
+                        </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Cargo" class="control-label">Cargo al que postula</label>
-                <select asp-for="Cargo" class="form-control">
-                    <option value="Presidente">Presidente</option>
-                    <option value="Vicepresidente">Vicepresidente</option>
-                    <option value="Asambleista">Asambleísta</option>
-                    <option value="Prefecto">Prefecto</option>
-                    <option value="Alcalde">Alcalde</option>
-                </select>
-                <span asp-validation-for="Cargo" class="text-danger"></span>
-            </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Cargo" class="form-label fw-bold">Cargo / Dignidad</label>
+                                <input asp-for="Cargo" class="form-control" placeholder="Ej: Rector" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ListaPoliticaId" class="form-label fw-bold">Asignar Lista</label>
+                                <select asp-for="ListaPoliticaId" class="form-select" asp-items="ViewBag.ListaPoliticaId">
+                                    <option value="">-- Seleccione una Lista --</option>
+                                </select>
+                            </div>
+                        </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="FotoUrl" class="control-label">Link de la Foto</label>
-                <input asp-for="FotoUrl" class="form-control" value="https://via.placeholder.com/150" />
-                <small class="text-muted">Dejamos una imagen por defecto para probar.</small>
-                <span asp-validation-for="FotoUrl" class="text-danger"></span>
-            </div>
+                        <div class="mb-4">
+                            <label asp-for="FotoUrl" class="form-label fw-bold text-primary">URL de la Foto</label>
+                            <input asp-for="FotoUrl" class="form-control" placeholder="https://link-de-imagen.jpg" />
+                        </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="PlanGobiernoUrl" class="control-label">Link Plan de Gobierno</label>
-                <input asp-for="PlanGobiernoUrl" class="form-control" value="http://www.ejemplo.com/plan.pdf" />
-                <span asp-validation-for="PlanGobiernoUrl" class="text-danger"></span>
-            </div>
+                        <div class="mb-4">
+                            <label asp-for="PlanGobiernoUrl" class="form-label fw-bold text-success">URL del Plan de Gobierno (PDF)</label>
+                            <input asp-for="PlanGobiernoUrl" class="form-control" placeholder="https://link-documento.pdf" />
+                        </div>
 
-            <div class="card bg-light mb-3">
-                <div class="card-body">
-                    <label asp-for="ListaPoliticaId" class="control-label fw-bold">ID de la Lista Política</label>
-                    <input asp-for="ListaPoliticaId" class="form-control" type="number" />
-                    <span asp-validation-for="ListaPoliticaId" class="text-danger"></span>
-                    <small class="text-danger">
-                        ⚠️ Debes poner el ID de una lista que YA EXISTA en la base de datos (Ej: 1).
-                    </small>
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">
+                                <i class="fa-solid fa-save me-2"></i> Guardar Candidato
+                            </button>
+                            <a asp-action="Index" class="btn btn-light rounded-pill border-0">Cancelar</a>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="form-group mt-4">
-                <input type="submit" value="Guardar Candidato" class="btn btn-success" />
-                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

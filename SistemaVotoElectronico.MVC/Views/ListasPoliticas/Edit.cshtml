@@ -1,0 +1,77 @@
+﻿@model SistemaVoto.Modelos.ListaPolitica
+
+@{
+    ViewData["Title"] = "Editar Lista";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-flag-checkered me-2"></i>Modificar Organización Política</h5>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-action="Edit" id="formEditarLista" autocomplete="off">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-4">
+                            <label asp-for="Nombre" class="form-label fw-bold">Nombre de la Lista</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-font text-primary"></i></span>
+                                <input asp-for="Nombre" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Eslogan" class="form-label fw-bold">Eslogan o Lema</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-quote-left text-primary"></i></span>
+                                <input asp-for="Eslogan" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="mb-4 text-center">
+                            <p class="text-muted small fw-bold">Previsualización del Logo Actual:</p>
+                            <img src="@Model.LogoUrl" class="img-thumbnail rounded shadow-sm" style="max-height: 100px; object-fit: contain;" id="imgPreview">
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="LogoUrl" class="form-label fw-bold text-primary">URL del Nuevo Logo</label>
+                            <input asp-for="LogoUrl" class="form-control" onchange="document.getElementById('imgPreview').src = this.value" />
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="button" onclick="confirmarCambios()" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm">
+                                <i class="fa-solid fa-rotate me-2"></i> Guardar Cambios
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill border-0">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarCambios() {
+            Swal.fire({
+                title: '¿Confirmar cambios?',
+                text: "Se actualizará la información de la lista política.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'Sí, actualizar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('formEditarLista').submit();
+                }
+            })
+        }
+    </script>
+}

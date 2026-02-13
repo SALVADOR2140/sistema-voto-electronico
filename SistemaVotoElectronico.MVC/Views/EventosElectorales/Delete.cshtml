@@ -1,0 +1,60 @@
+﻿@model SistemaVoto.Modelos.EventoElectoral
+
+@{
+    ViewData["Title"] = "Eliminar Evento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-danger text-white text-center py-4">
+                    <i class="fa-solid fa-triangle-exclamation fa-4x mb-2"></i>
+                    <h3 class="fw-bold mb-0">¿Eliminar Evento?</h3>
+                </div>
+                <div class="card-body p-5 text-center">
+                    <p class="text-muted">Se borrará el evento: <strong>@Model.Nombre</strong></p>
+                    <p class="text-danger small fw-bold">⚠️ Esta acción eliminará también los registros asociados.</p>
+
+                    <form asp-action="Delete" id="formEliminarEvento">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="button" onclick="pedirPasswordAdmin()" class="btn btn-danger btn-lg rounded-pill fw-bold">
+                                <i class="fa-solid fa-trash-can me-2"></i> Borrar permanentemente
+                            </button>
+                            <a asp-action="Index" class="btn btn-light rounded-pill border-0">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function pedirPasswordAdmin() {
+            Swal.fire({
+                title: 'Seguridad del Sistema',
+                text: "Ingrese la contraseña de administrador para confirmar el borrado:",
+                input: 'password',
+                inputAttributes: { autocapitalize: 'off', placeholder: 'Contraseña de admin' },
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar Eliminación',
+                confirmButtonColor: '#dc3545',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aquí comparamos con la clave fija "1234" (o la que tú definas)
+                    if (result.value === "1234") {
+                        document.getElementById('formEliminarEvento').submit();
+                    } else {
+                        Swal.fire('Error', 'Contraseña incorrecta. Acción cancelada.', 'error');
+                    }
+                }
+            });
+        }
+    </script>
+}

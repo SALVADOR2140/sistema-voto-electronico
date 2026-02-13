@@ -48,6 +48,9 @@ namespace SistemaVotoElectronico.Api
             // Licencia PDF (Opcional, para que no de error si lo tienes)
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
+            //Servicio de Email
+            builder.Services.AddScoped<SistemaVotoElectronico.Api.Servicios.IEmailService, SistemaVotoElectronico.Api.Servicios.EmailService>();
+
             var app = builder.Build();
 
             // 4. Pipeline

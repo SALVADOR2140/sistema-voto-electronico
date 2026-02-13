@@ -58,21 +58,19 @@ namespace SistemaVotoElectronico.MVC.Controllers
         // POST: Usuarios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
-        public async Task<IActionResult> Create([Bind("Id,Cedula,Nombres,Correo,Clave,TokenVotacion,RolUsuarioId")] Usuario usuario)
+        public async Task<IActionResult> Create(Usuario usuario)
         {
-
-            usuario.YaVoto = false;    // Nadie ha votado al ser creado
+   
+            usuario.RolUsuarioId = 3;   
+            usuario.YaVoto = false;   
+            usuario.TokenVotacion = null; 
+                                   
 
             if (ModelState.IsValid)
             {
-                _context.Add(usuario);
-                await _context.SaveChangesAsync();
+      
                 return RedirectToAction(nameof(Index));
             }
-
-         
-            ViewData["RolUsuarioId"] = new SelectList(_context.RolUsuarios, "Id", "NombreRol", usuario.RolUsuarioId);
             return View(usuario);
         }
 

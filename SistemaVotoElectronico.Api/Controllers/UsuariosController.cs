@@ -73,16 +73,33 @@ namespace SistemaVotoElectronico.Api.Controllers
         }
 
         // POST: api/Usuarios
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
+  
+            usuario.TokenVotacion = null;
+
+            usuario.YaVoto = false;
+
             _context.Usuarios.Add(usuario);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (UsuarioExists(usuario.Id))
+                {
+                    return Conflict("Este ID de usuario ya existe.");
+                }
+                else
+                {
+                    throw; 
+                }
+            }
 
             return CreatedAtAction("GetUsuario", new { id = usuario.Id }, usuario);
         }
-
         // DELETE: api/Usuarios/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUsuario(int id)

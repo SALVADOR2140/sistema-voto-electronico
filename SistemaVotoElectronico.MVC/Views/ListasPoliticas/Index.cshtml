@@ -1,0 +1,46 @@
+﻿@model IEnumerable<SistemaVoto.Modelos.ListaPolitica>
+
+@{
+    ViewData["Title"] = "Listas Políticas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark">
+                <i class="fa-solid fa-flag me-2 text-primary"></i>Organizaciones Políticas
+            </h2>
+            <p class="text-muted">Gestione las listas, sus logos y lemas de campaña.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fa-solid fa-plus me-2"></i> Nueva Lista
+        </a>
+    </div>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                    <div class="bg-light p-4 text-center border-bottom">
+                        <img src="@(string.IsNullOrEmpty(item.LogoUrl) ? "https://ui-avatars.com/api/?name=" + item.Nombre : item.LogoUrl)"
+                             class="img-fluid rounded-3 shadow-sm" style="height: 120px; object-fit: contain;" />
+                    </div>
+                    <div class="card-body p-4">
+                        <h4 class="fw-bold text-primary mb-1">@item.Nombre</h4>
+                        <p class="text-muted small mb-3">@item.Eslogan</p>
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="btn-group shadow-sm rounded-pill overflow-hidden">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0 px-3"><i class="fa-solid fa-pen"></i></a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm border-0 px-3"><i class="fa-solid fa-eye"></i></a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm border-0 px-3"><i class="fa-solid fa-trash"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

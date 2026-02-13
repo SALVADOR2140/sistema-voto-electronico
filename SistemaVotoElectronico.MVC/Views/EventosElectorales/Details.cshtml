@@ -1,0 +1,40 @@
+﻿@model SistemaVoto.Modelos.EventoElectoral
+
+@{
+    ViewData["Title"] = "Detalles del Evento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-dark text-white text-center py-4">
+                    <i class="fa-solid fa-calendar-check fa-3x mb-2"></i>
+                    <h4 class="mb-0 fw-bold">Información del Evento</h4>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <tbody>
+                            <tr><th class="ps-4 py-3 text-muted w-40">Nombre</th><td class="py-3 fw-bold">@Model.Nombre</td></tr>
+                            <tr><th class="ps-4 py-3 text-muted">Inicia</th><td class="py-3">@Model.FechaInicio.ToString("f")</td></tr>
+                            <tr><th class="ps-4 py-3 text-muted">Termina</th><td class="py-3">@Model.FechaFin.ToString("f")</td></tr>
+                            <tr>
+                                <th class="ps-4 py-3 text-muted">Estado</th>
+                                <td class="py-3">
+                                    <span class="badge @(Model.Activo ? "bg-success" : "bg-danger")">
+                                        @(Model.Activo ? "ACTIVO" : "INACTIVO")
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-light p-4 text-center">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 rounded-pill fw-bold">Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary px-4 rounded-pill">Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,74 +1,74 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SistemaVoto.Modelos;
+using System.Text;
 
 namespace SistemaVotoElectronico.MVC.Controllers
 {
     public class JuntasController : Controller
     {
-        private readonly SistemaVotoElectronicoApiContext _context;
+        private bool EsAdministrador() => HttpContext.Session.GetInt32("RolUsuarioId") == 1;
 
-
-        public JuntasController(SistemaVotoElectronicoApiContext context)
-        {
-            _context = context;
-        }
-
-        private bool EsJefeDeJunta() => HttpContext.Session.GetInt32("RolUsuarioId") == 2;
-
-        // GET: Juntas
+        // GET: Pantalla de Mesa de Control
         public IActionResult Index()
         {
-            if (!EsJefeDeJunta()) return RedirectToAction("Index", "Login"); // Seguridad
+            if (!EsAdministrador()) return RedirectToAction("Index", "Login");
             return View();
         }
 
-
-        // POST: Juntas/Create Tokens 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Generar Token llamando a la API
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GenerarToken(string cedula)
         {
-            // Agregamos seguridad también al procesar el formulario
-            if (!EsJefeDeJunta()) return RedirectToAction("Index", "Login");
+            if (!EsAdministrador()) return RedirectToAction("Index", "Login");
 
             if (string.IsNullOrEmpty(cedula))
             {
-                TempData["Error"] = "Por favor, ingrese un número de cédula.";
+                TempData["Error"] = "Ingrese la cédula.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Buscamos solo usuarios que sean Votantes (Rol 2)
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Cedula == cedula && u.RolUsuarioId == 3);
-
-            if (usuario == null)
+            try
             {
-                TempData["Error"] = "Votante no encontrado en el padrón electoral.";
-                return RedirectToAction(nameof(Index));
-            }
+                using (var client = new HttpClient())
+                {
+                    string urlApi = "http://localhost:5111/api/Junta/GenerarToken";
+                    var jsonContent = JsonConvert.SerializeObject(cedula);
+                    var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            if (usuario.YaVoto)
+                    var response = await client.PostAsync(urlApi, content);
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        dynamic resultado = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+ 
+                        var usuarioVista = new Usuario
+                        {
+                            Cedula = cedula,
+                            Nombres = resultado.nombre,
+                            Correo = resultado.correo
+                        };
+
+                        ViewBag.Mensaje = resultado.mensaje;
+                        return View("TokenGenerado", usuarioVista);
+                    }
+                    else
+                    {
+                        // Manejo de errores de la API
+                        dynamic errorObj = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        TempData["Error"] = errorObj.mensaje ?? "Error en la operación.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+            catch (Exception ex)
             {
-                TempData["Error"] = "¡Atención! Este estudiante ya ejerció su derecho al voto.";
+                TempData["Error"] = "Error de conexión con la API.";
                 return RedirectToAction(nameof(Index));
             }
-
-            // Generamos el Token de 6 caracteres único
-            usuario.TokenVotacion = Guid.NewGuid().ToString().Substring(0, 6).ToUpper();
-
-            _context.Update(usuario);
-            await _context.SaveChangesAsync();
-
-            return View("TokenGenerado", usuario);
         }
-
     }
 }

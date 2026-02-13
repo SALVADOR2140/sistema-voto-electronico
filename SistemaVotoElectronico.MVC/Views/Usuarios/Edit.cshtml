@@ -1,64 +1,97 @@
 ﻿@model SistemaVoto.Modelos.Usuario
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Votante";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<div class="container-fluid p-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-warning text-dark py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-pen me-2"></i> Modificar Datos del Votante</h5>
+                </div>
+                <div class="card-body p-5">
 
-<h4>Usuario</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Cedula" class="control-label"></label>
-                <input asp-for="Cedula" class="form-control" />
-                <span asp-validation-for="Cedula" class="text-danger"></span>
+                    @* Le agregamos un ID al form para controlarlo con JS *@
+                    <form asp-action="Edit" id="formEditarVotante" autocomplete="off">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold text-muted">Cédula</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fa-solid fa-id-card"></i></span>
+                                    <input asp-for="Cedula" class="form-control bg-light" readonly />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Correo" class="form-label fw-bold text-muted">Correo Institucional</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-primary"></i></span>
+                                    <input asp-for="Correo" class="form-control" type="email" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Nombres" class="form-label fw-bold text-muted">Nombres Completos</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-user text-primary"></i></span>
+                                <input asp-for="Nombres" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Clave" class="form-label fw-bold text-muted">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-key text-primary"></i></span>
+                                <input asp-for="Clave" class="form-control" type="password" required />
+                            </div>
+                        </div>
+
+                        <input type="hidden" asp-for="YaVoto" />
+                        <input type="hidden" asp-for="TokenVotacion" />
+                        <input type="hidden" asp-for="RolUsuarioId" />
+
+                        <div class="d-grid gap-2 mt-4">
+                            @* El botón ahora llama a la función de confirmación *@
+                            <button type="button" onclick="confirmarActualizacion()" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                                <i class="fa-solid fa-rotate me-2"></i> Actualizar Información
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Nombres" class="control-label"></label>
-                <input asp-for="Nombres" class="form-control" />
-                <span asp-validation-for="Nombres" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Correo" class="control-label"></label>
-                <input asp-for="Correo" class="form-control" />
-                <span asp-validation-for="Correo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Clave" class="control-label"></label>
-                <input asp-for="Clave" class="form-control" />
-                <span asp-validation-for="Clave" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="YaVoto" /> @Html.DisplayNameFor(model => model.YaVoto)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="TokenVotacion" class="control-label"></label>
-                <input asp-for="TokenVotacion" class="form-control" />
-                <span asp-validation-for="TokenVotacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RolUsuarioId" class="control-label"></label>
-                <select asp-for="RolUsuarioId" class="form-control" asp-items="ViewBag.RolUsuarioId"></select>
-                <span asp-validation-for="RolUsuarioId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarActualizacion() {
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: "Se actualizarán los datos del votante en el padrón electoral.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, actualizar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario acepta, enviamos el formulario manualmente
+                    document.getElementById('formEditarVotante').submit();
+                }
+            })
+        }
+    </script>
 }

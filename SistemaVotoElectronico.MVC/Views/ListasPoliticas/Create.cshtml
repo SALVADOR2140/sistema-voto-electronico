@@ -1,0 +1,43 @@
+﻿@model SistemaVoto.Modelos.ListaPolitica
+
+@{
+    ViewData["Title"] = "Registrar Lista";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-flag me-2"></i>Nueva Organización Política</h5>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-action="Create" autocomplete="off">
+                        <div class="mb-4">
+                            <label asp-for="Nombre" class="form-label fw-bold">Nombre de la Lista</label>
+                            <input asp-for="Nombre" class="form-control form-control-lg" placeholder="Ej: Lista 1 - Unidad Estudiantil" required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Eslogan" class="form-label fw-bold">Eslogan o Lema</label>
+                            <input asp-for="Eslogan" class="form-control" placeholder="Ej: Por una universidad mejor" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="LogoUrl" class="form-label fw-bold text-primary">URL del Logo (Imagen)</label>
+                            <input asp-for="LogoUrl" class="form-control" placeholder="https://..." />
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">
+                                <i class="fa-solid fa-save me-2"></i> Registrar Lista
+                            </button>
+                            <a asp-action="Index" class="btn btn-light rounded-pill border-0">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

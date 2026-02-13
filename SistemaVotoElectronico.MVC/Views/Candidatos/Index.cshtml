@@ -2,42 +2,64 @@
 
 @{
     ViewData["Title"] = "Gestión de Candidatos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Gestión de Candidatos</h1>
-
-@if (TempData["MensajeExito"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fa-solid fa-check-circle"></i> @TempData["MensajeExito"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Registrar Nuevo Candidato</a>
-</p>
-
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    @foreach (var item in Model)
-    {
-        <div class="col">
-            <div class="card h-100 shadow-sm">
-                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="card-img-top p-3" alt="Foto Candidato" style="height: 200px; object-fit: contain;">
-
-                <div class="card-body text-center">
-                    <h5 class="card-title">@item.Nombres</h5>
-                    <p class="card-text text-muted">ID: @item.Id</p>
-                    <span class="badge bg-info text-dark">Partido / Movimiento</span>
-                </div>
-
-                <div class="card-footer bg-transparent border-top-0 text-center pb-3">
-                    <div class="btn-group" role="group">
-                        @Html.ActionLink("Editar", "Edit", new { id = item.Id }, new { @class = "btn btn-outline-warning btn-sm" })
-                        @Html.ActionLink("Eliminar", "Delete", new { id = item.Id }, new { @class = "btn btn-outline-danger btn-sm" })
-                    </div>
-                </div>
-            </div>
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark">
+                <i class="fa-solid fa-user-tie me-2 text-primary"></i>Gestión de Candidatos
+            </h2>
+            <p class="text-muted">Administre los perfiles de los aspirantes y sus planes de gobierno.</p>
         </div>
-    }
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fa-solid fa-user-plus me-2"></i> Nuevo Candidato
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th class="ps-4 py-3">Candidato</th>
+                        <th class="py-3">Cargo</th>
+                        <th class="py-3">Lista Política</th>
+                        <th class="py-3 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle overflow-hidden shadow-sm me-3" style="width: 50px; height: 50px; border: 2px solid #eee;">
+                                        <img src="@(string.IsNullOrEmpty(item.FotoUrl) ? "https://ui-avatars.com/api/?name=" + item.Nombres : item.FotoUrl)"
+                                             class="w-100 h-100" style="object-fit: cover;" />
+                                    </div>
+                                    <div class="fw-bold text-dark">@item.Nombres</div>
+                                </div>
+                            </td>
+                            <td><span class="text-dark">@item.Cargo</span></td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary px-3 rounded-pill">
+                                    @* Mostramos el nombre de la lista desde la propiedad de navegación *@
+                                    <i class="fa-solid fa-flag me-1"></i> @(item.ListaPolitica?.Nombre ?? "Sin Lista")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group shadow-sm rounded-3 overflow-hidden">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm border-0 py-2 px-3" title="Editar"><i class="fa-solid fa-pen"></i></a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm border-0 py-2 px-3" title="Detalles"><i class="fa-solid fa-eye"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm border-0 py-2 px-3" title="Eliminar"><i class="fa-solid fa-trash-can"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

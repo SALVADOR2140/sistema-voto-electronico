@@ -35,6 +35,12 @@
                     }
                 </span>
             </a>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ListasPoliticas" ? "active" : "")"
+                   asp-controller="ListasPoliticas" asp-action="Index">
+                    <i class="fa-solid fa-flag me-2 text-primary"></i> Listas Políticas
+                </a>
+            </li>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenu">
                 <li><h6 class="dropdown-header">Mi Cuenta</h6></li>
                 <li><a class="dropdown-item" href="#">Perfil</a></li>
@@ -51,43 +57,38 @@
     <nav class="sidebar shadow-sm">
         <div class="py-2">
 
-            @* === SECCIÓN PARA EL ADMIN (Rol 1) === *@
+            @* === MENÚ DE ADMINISTRADOR (Rol 1) === *@
             @if (Context.Session.GetInt32("RolUsuarioId") == 1)
             {
                 <p class="text-uppercase text-muted small fw-bold px-4 mt-3 mb-2">Principal</p>
+
                 <a asp-controller="Home" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
 
-                <p class="text-uppercase text-muted small fw-bold px-4 mt-4 mb-2">Administración</p>
+                @* 👇 NUEVA SECCIÓN UNIFICADA: MESA DE CONTROL 👇 *@
+                <p class="text-uppercase text-muted small fw-bold px-4 mt-4 mb-2">Mesa de Control</p>
+
+                <a asp-controller="Juntas" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Juntas" ? "active" : "")">
+                    <i class="fa-solid fa-id-card-clip"></i> Validar Votante
+                </a>
+
+                <p class="text-uppercase text-muted small fw-bold px-4 mt-4 mb-2">Configuración</p>
 
                 <a asp-controller="EventosElectorales" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "EventosElectorales" ? "active" : "")">
-                    <i class="fa-solid fa-calendar-check"></i> Gestionar Eventos
+                    <i class="fa-solid fa-calendar-check"></i> Eventos
                 </a>
 
                 <a asp-controller="Candidatos" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Candidatos" ? "active" : "")">
-                    <i class="fa-solid fa-user-tie"></i> Gestionar Candidatos
-                </a>
-
-                @* 👇 AQUÍ AGREGAMOS EL BOTÓN QUE FALTABA 👇 *@
-                <a asp-controller="Jefes" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Jefes" ? "active" : "")">
-                    <i class="fa-solid fa-user-shield"></i> Gestionar Jefes Junta
+                    <i class="fa-solid fa-user-tie"></i> Candidatos
                 </a>
 
                 <a asp-controller="Usuarios" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Usuarios" ? "active" : "")">
-                    <i class="fa-solid fa-users-gear"></i> Gestionar Votantes
+                    <i class="fa-solid fa-users-gear"></i> Padrón (Votantes)
                 </a>
             }
 
-            @* === SECCIÓN PARA EL JEFE DE JUNTA (Rol 2) === *@
-            @* ⚠️ CORREGIDO: Antes tenías 3, pero el Jefe es 2 *@
-            @if (Context.Session.GetInt32("RolUsuarioId") == 2)
-            {
-                <p class="text-uppercase text-muted small fw-bold px-4 mt-3 mb-2">Operaciones</p>
-                <a asp-controller="Juntas" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Juntas" ? "active" : "")">
-                    <i class="fa-solid fa-id-card-clip"></i> Mesa de Junta
-                </a>
-            }
+            @* (Opcional) Si quieres que el Candidato vea algo, agrega un if (Rol == 2) aquí *@
 
         </div>
     </nav>

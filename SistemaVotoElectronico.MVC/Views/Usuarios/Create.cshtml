@@ -1,62 +1,80 @@
 ﻿@model SistemaVoto.Modelos.Usuario
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Registrar Votante";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<div class="container-fluid p-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-plus me-2"></i> Nuevo Votante</h5>
+                </div>
+                <div class="card-body p-5">
 
-<h4>Usuario</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Cedula" class="control-label"></label>
-                <input asp-for="Cedula" class="form-control" />
-                <span asp-validation-for="Cedula" class="text-danger"></span>
+                    <form asp-action="Create" autocomplete="off">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="Cedula" class="form-label fw-bold text-muted">Número de Cédula</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-id-card text-primary"></i></span>
+                                <input asp-for="Cedula" class="form-control form-control-lg" placeholder="100000000" required />
+                            </div>
+                            <span asp-validation-for="Cedula" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Nombres" class="form-label fw-bold text-muted">Nombres Completos</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-user text-primary"></i></span>
+                                <input asp-for="Nombres" class="form-control form-control-lg" placeholder="" required />
+                            </div>
+                            <span asp-validation-for="Nombres" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Correo" class="form-label fw-bold text-muted">Correo electronico</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-primary"></i></span>
+                                <input asp-for="Correo" class="form-control form-control-lg" type="email" placeholder="" required />
+                            </div>
+                            <span asp-validation-for="Correo" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Clave" class="form-label fw-bold text-muted">Contraseña de Acceso</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fa-solid fa-key text-primary"></i></span>
+                                <input asp-for="Clave" class="form-control form-control-lg" type="password" placeholder="••••••" required />
+                            </div>
+                            <span asp-validation-for="Clave" class="text-danger small"></span>
+                        </div>
+
+                        <input type="hidden" name="RolUsuarioId" value="3" />
+                        <input type="hidden" name="YaVoto" value="false" />
+                        <input type="hidden" name="TokenVotacion" value="" />
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                                <i class="fa-solid fa-save me-2"></i> Guardar Votante
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill border-0">
+                                Cancelar y Volver
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Nombres" class="control-label"></label>
-                <input asp-for="Nombres" class="form-control" />
-                <span asp-validation-for="Nombres" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Correo" class="control-label"></label>
-                <input asp-for="Correo" class="form-control" />
-                <span asp-validation-for="Correo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Clave" class="control-label"></label>
-                <input asp-for="Clave" class="form-control" />
-                <span asp-validation-for="Clave" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="YaVoto" /> @Html.DisplayNameFor(model => model.YaVoto)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="TokenVotacion" class="control-label"></label>
-                <input asp-for="TokenVotacion" class="form-control" />
-                <span asp-validation-for="TokenVotacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RolUsuarioId" class="control-label"></label>
-                <select asp-for="RolUsuarioId" class ="form-control" asp-items="ViewBag.RolUsuarioId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
