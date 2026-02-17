@@ -1,35 +1,52 @@
 ﻿@model SistemaVoto.Modelos.Candidato
 
 @{
-    ViewData["Title"] = "Ficha del Candidato";
+    ViewData["Title"] = "Eliminar Candidato";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center py-4">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-lg rounded-4 text-center overflow-hidden">
-            <div class="bg-primary py-5">
-                <img src="@Model.FotoUrl" class="rounded-circle shadow border border-4 border-white" style="width: 140px; height: 140px; object-fit: cover;">
-            </div>
-            <div class="card-body p-5">
-                <h2 class="fw-bold mb-1">@Model.Nombres</h2>
-                <p class="text-primary fw-bold text-uppercase fs-5">@Model.Cargo</p>
-                <hr>
-                <div class="mb-4">
-                    <p class="text-muted small mb-1">PERTENECE A:</p>
-                    <h5 class="fw-bold">@(Model.ListaPolitica?.Nombre ?? "Independiente")</h5>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                <div class="card-header bg-danger text-white p-4 text-center">
+                    <i class="fa-solid fa-triangle-exclamation fa-3x mb-2 opacity-75"></i>
+                    <h3 class="fw-bold m-0">¿Eliminar Candidato?</h3>
+                    <p class="mb-0 opacity-75 small">Esta acción no se puede deshacer.</p>
                 </div>
 
-                @if (!string.IsNullOrEmpty(Model.PlanGobiernoUrl))
-                {
-                    <a href="@Model.PlanGobiernoUrl" target="_blank" class="btn btn-outline-success w-100 mb-3 rounded-pill">
-                        <i class="fa-solid fa-file-pdf me-2"></i> Ver Plan de Gobierno
-                    </a>
-                }
+                <div class="card-body p-4 text-center">
 
-                <div class="d-flex justify-content-center gap-2 mt-4">
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 rounded-pill fw-bold">Editar</a>
-                    <a asp-action="Index" class="btn btn-secondary px-4 rounded-pill">Volver</a>
+                    <div class="mb-4">
+                        @{
+                            string img = Model.FotoUrl;
+                            if (!string.IsNullOrEmpty(img) && !img.StartsWith("http") && !img.StartsWith("data:"))
+                            { img = $"data:image/png;base64,{img}"; }
+                        }
+                        @if (!string.IsNullOrEmpty(img))
+                        {
+                            <img src="@img" class="rounded-circle border shadow mb-3" style="width: 100px; height: 100px; object-fit: cover;" onerror="this.style.display='none';" />
+                        }
+
+                        <h4 class="fw-bold text-dark mb-0">@Model.Nombres</h4>
+                        <span class="badge bg-secondary mt-2">@Model.Cargo</span>
+                    </div>
+
+                    <div class="alert alert-warning text-start small border-0 bg-warning bg-opacity-10 text-warning-emphasis">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        El candidato será eliminado permanentemente del sistema electoral.
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg fw-bold rounded-pill">
+                                Sí, Eliminar Definitivamente
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">Cancelar</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

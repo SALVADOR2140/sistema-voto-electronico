@@ -1,60 +1,107 @@
 ﻿@model SistemaVoto.Modelos.ListaPolitica
 
 @{
-    ViewData["Title"] = "Detalles de la Lista";
+    ViewData["Title"] = "Perfil de Organización";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-        <div class="card-header bg-primary text-white py-3">
-            <h4 class="mb-0 fw-bold"><i class="fa-solid fa-circle-info me-2"></i>Detalles de la Organización</h4>
-        </div>
+<div class="container py-5">
 
-        <div class="card-body p-4">
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center mb-4 mb-md-0">
-                    <div class="p-3 border rounded-3 bg-light shadow-sm d-inline-block">
-                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
-                        {
-                            <img src="@Model.LogoUrl" class="img-fluid rounded"
-                                 style="max-height: 200px; max-width: 100%; object-fit: contain;"
-                                 alt="Logo @Model.Nombre"
-                                 onerror="this.src='https://placehold.co/200x200?text=Sin+Imagen';" />
-                        }
-                        else
-                        {
-                            <div class="text-muted py-5 px-4">
-                                <i class="fa-solid fa-image fa-4x mb-2"></i>
-                                <p class="mb-0">Sin Logo Disponible</p>
-                            </div>
-                        }
-                    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="fa-solid fa-address-card me-2 text-primary"></i>Perfil de la Organización
+            </h2>
+            <p class="text-muted mb-0">Información detallada registrada en el CNE Universitario.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-arrow-left me-2"></i>Volver
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                <div class="card-header border-0 p-5 text-center position-relative" style="background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%); height: 180px;">
+                    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;"></div>
                 </div>
 
-                <div class="col-md-8">
-                    <h2 class="fw-bold text-dark mb-1">@Model.Nombre</h2>
-                    <p class="text-muted fst-italic fs-5 mb-4">"@Model.Eslogan"</p>
+                <div class="text-center position-relative" style="margin-top: -75px;">
+                    @{
+                        string imagenSrc = Model.LogoUrl;
+                        if (!string.IsNullOrEmpty(imagenSrc) && !imagenSrc.StartsWith("http") && !imagenSrc.StartsWith("data:"))
+                        {
+                            imagenSrc = $"data:image/png;base64,{imagenSrc}";
+                        }
+                    }
 
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <div class="p-3 rounded-3 bg-light border-start border-4 border-primary">
-                                <small class="text-uppercase text-muted fw-bold">Evento Electoral Asignado</small>
-                                <div class="fs-5 fw-bold text-primary mt-1">
-                                    <i class="fa-solid fa-calendar-check me-2"></i>
-                                    @(Model.EventoElectoral != null ? Model.EventoElectoral.Nombre : "Evento ID: " + Model.EventoElectoralId)
+                    @if (!string.IsNullOrEmpty(imagenSrc))
+                    {
+                        <img src="@imagenSrc" class="rounded-circle border border-5 border-white shadow-lg bg-white"
+                             style="width: 150px; height: 150px; object-fit: cover;"
+                             onerror="this.style.display='none'; document.getElementById('icon-fallback').style.display='inline-block';" />
+
+                        <div id="icon-fallback" class="rounded-circle border border-5 border-white shadow-lg bg-light d-flex align-items-center justify-content-center"
+                             style="width: 150px; height: 150px; display:none !important; margin: 0 auto;">
+                            <i class="fa-solid fa-building-columns fa-4x text-secondary"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rounded-circle border border-5 border-white shadow-lg bg-light d-inline-flex align-items-center justify-content-center"
+                             style="width: 150px; height: 150px;">
+                            <i class="fa-solid fa-building-columns fa-4x text-secondary"></i>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-body p-5 pt-3 text-center">
+
+                    <h1 class="fw-bold text-dark mb-1">@Model.Nombre</h1>
+                    <div class="mb-4">
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3">
+                            <i class="fa-solid fa-circle-check me-1"></i>Organización Habilitada
+                        </span>
+                    </div>
+
+                    <div class="py-4 px-5 mb-4 bg-light rounded-4 position-relative mx-auto" style="max-width: 80%;">
+                        <i class="fa-solid fa-quote-left fa-2x text-primary opacity-25 position-absolute top-0 start-0 translate-middle ms-4 mt-4"></i>
+                        <h4 class="fst-italic text-secondary mb-0 fw-light">"@Model.Eslogan"</h4>
+                        <i class="fa-solid fa-quote-right fa-2x text-primary opacity-25 position-absolute bottom-0 end-0 translate-middle me-4 mb-4"></i>
+                    </div>
+
+                    <hr class="opacity-10 my-4">
+
+                    <div class="row g-3 justify-content-center text-start">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center p-3 border rounded-3 shadow-sm hover-effect">
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 text-primary">
+                                    <i class="fa-solid fa-calendar-days fa-xl"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Participando en</small>
+                                    <h5 class="mb-0 fw-bold text-dark">
+                                        @(ViewBag.NombreEvento ?? "Evento ID: " + Model.EventoElectoralId)
+                                    </h5>
+                                    @if (ViewBag.FechaEvento != null)
+                                    {
+                                        <small class="text-muted">Inicio: @(((DateTime)ViewBag.FechaEvento).ToString("dd MMMM yyyy"))</small>
+                                    }
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-top d-flex gap-2">
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 shadow-sm fw-bold">
-                            <i class="fa-solid fa-pen me-2"></i>Editar
+                    <div class="mt-5 d-flex justify-content-center gap-3">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm fw-bold">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar Datos
                         </a>
-                        <a asp-action="Index" class="btn btn-secondary px-4 shadow-sm">
-                            <i class="fa-solid fa-arrow-left me-2"></i>Volver
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm">
+                            <i class="fa-solid fa-arrow-rotate-left me-2"></i>Volver
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>

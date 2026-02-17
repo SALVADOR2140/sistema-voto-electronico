@@ -5,76 +5,58 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid p-4">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-lg rounded-4">
-                <div class="card-header bg-primary text-white py-3 rounded-top-4">
-                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-plus me-2"></i> Nuevo Votante</h5>
+        <div class="col-md-6">
+            <div class="card shadow rounded-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold"><i class="fa-solid fa-user-plus me-2"></i>Nuevo Votante</h4>
                 </div>
-                <div class="card-body p-5">
+                <div class="card-body p-4">
 
-                    <form asp-action="Create" autocomplete="off">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger small shadow-sm">
+                            <i class="fa-solid fa-circle-exclamation me-1"></i> <b>Atención:</b>
+                            <div asp-validation-summary="All" class="mb-0 mt-1"></div>
+                        </div>
+                    }
 
-                        <div class="mb-4">
-                            <label asp-for="Cedula" class="form-label fw-bold text-muted">Número de Cédula</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-id-card text-primary"></i></span>
-                                <input asp-for="Cedula" class="form-control form-control-lg" placeholder="100000000" required />
-                            </div>
+                    <form asp-action="Create">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Número de Cédula</label>
+                            <input asp-for="Cedula" class="form-control" placeholder="Ej: 1004392804" required />
                             <span asp-validation-for="Cedula" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label asp-for="Nombres" class="form-label fw-bold text-muted">Nombres Completos</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-user text-primary"></i></span>
-                                <input asp-for="Nombres" class="form-control form-control-lg" placeholder="" required />
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombres Completos</label>
+                            <input asp-for="Nombres" class="form-control" placeholder="Ej: Nahín Imba" required />
                             <span asp-validation-for="Nombres" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-4">
-                            <label asp-for="Correo" class="form-label fw-bold text-muted">Correo electronico</label>
+                            <label class="form-label fw-bold">Correo Institucional</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-primary"></i></span>
-                                <input asp-for="Correo" class="form-control form-control-lg" type="email" placeholder="" required />
+                                <span class="input-group-text text-muted"><i class="fa-solid fa-envelope"></i></span>
+                                <input asp-for="Correo" class="form-control" type="email" placeholder="usuario@utn.edu.ec" required />
                             </div>
                             <span asp-validation-for="Correo" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label asp-for="Clave" class="form-label fw-bold text-muted">Contraseña de Acceso</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fa-solid fa-key text-primary"></i></span>
-                                <input asp-for="Clave" class="form-control form-control-lg" type="password" placeholder="••••••" required />
-                            </div>
-                            <span asp-validation-for="Clave" class="text-danger small"></span>
+                        <div class="alert alert-info small border-0 bg-info bg-opacity-10 text-info-emphasis mb-4">
+                            <i class="fa-solid fa-key me-1"></i>
+                            La <b>Contraseña</b> inicial será el número de cédula del votante.
                         </div>
 
-                        <input type="hidden" name="RolUsuarioId" value="3" />
-                        <input type="hidden" name="YaVoto" value="false" />
-                        <input type="hidden" name="TokenVotacion" value="" />
-
-                        <div class="d-grid gap-2 mt-5">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
-                                <i class="fa-solid fa-save me-2"></i> Guardar Votante
-                            </button>
-                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill border-0">
-                                Cancelar y Volver
-                            </a>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill">Registrar Votante</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">Cancelar</a>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

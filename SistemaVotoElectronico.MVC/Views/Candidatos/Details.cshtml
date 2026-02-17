@@ -1,35 +1,80 @@
 ﻿@model SistemaVoto.Modelos.Candidato
 
 @{
-    ViewData["Title"] = "Ficha del Candidato";
+    ViewData["Title"] = "Perfil del Candidato";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center py-4">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-lg rounded-4 text-center overflow-hidden">
-            <div class="bg-primary py-5">
-                <img src="@Model.FotoUrl" class="rounded-circle shadow border border-4 border-white" style="width: 140px; height: 140px; object-fit: cover;">
-            </div>
-            <div class="card-body p-5">
-                <h2 class="fw-bold mb-1">@Model.Nombres</h2>
-                <p class="text-primary fw-bold text-uppercase fs-5">@Model.Cargo</p>
-                <hr>
-                <div class="mb-4">
-                    <p class="text-muted small mb-1">PERTENECE A:</p>
-                    <h5 class="fw-bold">@(Model.ListaPolitica?.Nombre ?? "Independiente")</h5>
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="fa-solid fa-user-tie me-2 text-primary"></i>Perfil del Candidato</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i>Volver
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                <div class="card-header border-0 p-5 text-center" style="background: linear-gradient(135deg, #20c997 0%, #0d6efd 100%); height: 160px;"></div>
+
+                <div class="text-center position-relative" style="margin-top: -80px;">
+                    @{
+                        string img = Model.FotoUrl;
+                        if (!string.IsNullOrEmpty(img) && !img.StartsWith("http") && !img.StartsWith("data:"))
+                        {
+                            img = $"data:image/png;base64,{img}";
+                        }
+                    }
+
+                    @if (!string.IsNullOrEmpty(img))
+                    {
+                        <img src="@img" class="rounded-circle border border-5 border-white shadow-lg bg-white"
+                             style="width: 160px; height: 160px; object-fit: cover;"
+                             onerror="this.style.display='none'; document.getElementById('icon-fallback').style.display='inline-flex';" />
+
+                        <div id="icon-fallback" class="rounded-circle border border-5 border-white shadow-lg bg-white align-items-center justify-content-center"
+                             style="width: 160px; height: 160px; display:none;">
+                            <i class="fa-solid fa-user fa-4x text-muted"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rounded-circle border border-5 border-white shadow-lg bg-white d-inline-flex align-items-center justify-content-center" style="width: 160px; height: 160px;">
+                            <i class="fa-solid fa-user fa-4x text-muted"></i>
+                        </div>
+                    }
                 </div>
 
-                @if (!string.IsNullOrEmpty(Model.PlanGobiernoUrl))
-                {
-                    <a href="@Model.PlanGobiernoUrl" target="_blank" class="btn btn-outline-success w-100 mb-3 rounded-pill">
-                        <i class="fa-solid fa-file-pdf me-2"></i> Ver Plan de Gobierno
-                    </a>
-                }
+                <div class="card-body p-5 pt-3 text-center">
 
-                <div class="d-flex justify-content-center gap-2 mt-4">
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 rounded-pill fw-bold">Editar</a>
-                    <a asp-action="Index" class="btn btn-secondary px-4 rounded-pill">Volver</a>
+                    <h2 class="fw-bold mb-1">@Model.Nombres</h2>
+                    <p class="text-primary fw-bold text-uppercase ls-1">@Model.Cargo</p>
+
+                    <div class="py-3 px-4 bg-light rounded-3 mt-4 d-inline-block text-start">
+                        <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem;">Afiliación Política</small>
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-flag text-secondary me-2"></i>
+                            <h5 class="mb-0 fw-bold text-dark">
+                                @(ViewBag.NombreLista ?? "Candidato Independiente")
+                            </h5>
+                        </div>
+                    </div>
+
+                    <hr class="my-5 opacity-10">
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar Datos
+                        </a>
+
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm">
+                            <i class="fa-solid fa-arrow-rotate-left me-2"></i>Volver
+                        </a>
+                    </div>
+
                 </div>
             </div>
         </div>

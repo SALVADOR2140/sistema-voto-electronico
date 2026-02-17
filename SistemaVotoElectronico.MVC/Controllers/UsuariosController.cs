@@ -1,169 +1,204 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SistemaVoto.Modelos;
+using System.Text;
 
 namespace SistemaVotoElectronico.MVC.Controllers
 {
     public class UsuariosController : Controller
     {
-        private readonly SistemaVotoElectronicoApiContext _context;
+        private readonly HttpClient _httpClient;
+        private readonly string _apiUrl = "http://localhost:5111/api/Usuarios";
 
-        public UsuariosController(SistemaVotoElectronicoApiContext context)
+        public UsuariosController(IHttpClientFactory httpClientFactory)
         {
-            _context = context;
+            _httpClient = httpClientFactory.CreateClient();
         }
 
-        // GET: Usuarios
+        // 1. LISTADO (INDEX)
         public async Task<IActionResult> Index()
         {
-         
-            var votantes = _context.Usuarios
-                .Include(u => u.RolUsuario)
-                .Where(u => u.RolUsuarioId == 3);
-
-            return View(await votantes.ToListAsync());
+            var usuarios = await ObtenerListaGenerica<Usuario>(_apiUrl);
+            return View(usuarios);
         }
 
-        // GET: Usuarios/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // 2. DETALLES (DETAILS)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var usuario = await _context.Usuarios
-                .Include(u => u.RolUsuario)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (usuario == null)
-            {
-                return NotFound();
-            }
-
+            var usuario = await ObtenerEntidad<Usuario>(id);
+            if (usuario == null) return RedirectToAction(nameof(Index));
             return View(usuario);
         }
 
-        // GET: Usuarios/Create
+        // 3. CREAR (VISTA - GET)
         public IActionResult Create()
         {
-            ViewData["RolUsuarioId"] = new SelectList(_context.RolUsuarios, "Id", "NombreRol");
             return View();
         }
 
-        // POST: Usuarios/Create
+        // 4. CREAR (ACCIÓN - POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Usuario usuario)
         {
-   
-            usuario.RolUsuarioId = 3;   
-            usuario.YaVoto = false;   
-            usuario.TokenVotacion = null; 
-                                   
+            ModelState.Remove("Clave");
+            ModelState.Remove("RolUsuario");
+            ModelState.Remove("TokenVotacion");
+            ModelState.Remove("YaVoto");
 
-            if (ModelState.IsValid)
+            try
             {
-      
-                return RedirectToAction(nameof(Index));
+                usuario.Cedula = usuario.Cedula?.Trim();
+                usuario.YaVoto = false;
+                usuario.TokenVotacion = Guid.NewGuid().ToString().Substring(0, 6).ToUpper();
+
+                if (string.IsNullOrEmpty(usuario.Clave))
+                {
+                    usuario.Clave = usuario.Cedula;
+                }
+
+                if (usuario.RolUsuarioId == 0)
+                {
+                    usuario.RolUsuarioId = 3;
+                }
             }
-            return View(usuario);
-        }
-
-        // GET: Usuarios/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
+            catch (Exception ex)
             {
-                return NotFound();
-            }
-
-            var usuario = await _context.Usuarios.FindAsync(id);
-            if (usuario == null)
-            {
-                return NotFound();
-            }
-            ViewData["RolUsuarioId"] = new SelectList(_context.RolUsuarios, "Id", "NombreRol", usuario.RolUsuarioId);
-            return View(usuario);
-        }
-
-        // POST: Usuarios/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Cedula,Nombres,Correo,Clave,YaVoto,TokenVotacion,RolUsuarioId")] Usuario usuario)
-        {
-            if (id != usuario.Id)
-            {
-                return NotFound();
+                ModelState.AddModelError("", "Error en datos por defecto: " + ex.Message);
             }
 
             if (ModelState.IsValid)
             {
+                var json = JsonConvert.SerializeObject(usuario);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
                 try
                 {
-                    _context.Update(usuario);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UsuarioExists(usuario.Id))
+                    var response = await _httpClient.PostAsync(_apiUrl, content);
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        return NotFound();
+                        return RedirectToAction(nameof(Index));
                     }
                     else
                     {
-                        throw;
+                        var errorMsg = await response.Content.ReadAsStringAsync();
+                        if (response.StatusCode == System.Net.HttpStatusCode.Conflict || errorMsg.Contains("Cédula"))
+                        {
+                            ModelState.AddModelError("Cedula", "Esta cédula ya está registrada.");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", $"Error API: {response.StatusCode} - {errorMsg}");
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error de conexión: " + ex.Message);
+                }
             }
-            ViewData["RolUsuarioId"] = new SelectList(_context.RolUsuarios, "Id", "NombreRol", usuario.RolUsuarioId);
+
             return View(usuario);
         }
 
-        // GET: Usuarios/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // 5. EDITAR (VISTA - GET)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var usuario = await _context.Usuarios
-                .Include(u => u.RolUsuario)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (usuario == null)
-            {
-                return NotFound();
-            }
-
+            var usuario = await ObtenerEntidad<Usuario>(id);
+            if (usuario == null) return NotFound();
             return View(usuario);
         }
 
-        // POST: Usuarios/Delete/5
+        // 6. EDITAR (ACCIÓN - POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Usuario usuario)
+        {
+            ModelState.Remove("Clave");
+            ModelState.Remove("RolUsuario");
+            ModelState.Remove("TokenVotacion");
+
+            if (ModelState.IsValid)
+            {
+                var json = JsonConvert.SerializeObject(usuario);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync($"{_apiUrl}/{id}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                ModelState.AddModelError("", "No se pudo actualizar el votante.");
+            }
+            return View(usuario);
+        }
+
+        // 7. ELIMINAR (VISTA - GET)
+        public async Task<IActionResult> Delete(int id)
+        {
+            var usuario = await ObtenerEntidad<Usuario>(id);
+            if (usuario == null) return NotFound();
+            return View(usuario);
+        }
+
+        // 8. ELIMINAR (CONFIRMACIÓN - POST)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
-            if (usuario != null)
+            var response = await _httpClient.DeleteAsync($"{_apiUrl}/{id}");
+            if (response.IsSuccessStatusCode)
             {
-                _context.Usuarios.Remove(usuario);
+                return RedirectToAction(nameof(Index));
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { error = "No se pudo eliminar el registro" });
         }
 
-        private bool UsuarioExists(int id)
+
+        private async Task<IEnumerable<T>> ObtenerListaGenerica<T>(string url)
         {
-            return _context.Usuarios.Any(e => e.Id == id);
+            try
+            {
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var token = JToken.Parse(json);
+
+                    if (token is JArray) return token.ToObject<IEnumerable<T>>();
+
+                    if (token is JObject obj)
+                    {
+                        if (obj["result"] is JArray arr) return arr.ToObject<IEnumerable<T>>();
+                        if (obj["data"] is JArray arr2) return arr2.ToObject<IEnumerable<T>>();
+                    }
+                }
+            }
+            catch { }
+            return new List<T>();
+        }
+
+        private async Task<T> ObtenerEntidad<T>(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"{_apiUrl}/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var token = JToken.Parse(json);
+                    if (token is JObject obj)
+                    {
+                        if (obj.ContainsKey("result")) return obj["result"].ToObject<T>();
+                        if (obj.ContainsKey("data")) return obj["data"].ToObject<T>();
+                    }
+                    return JsonConvert.DeserializeObject<T>(json);
+                }
+            }
+            catch { }
+            return default(T);
         }
     }
 }

@@ -5,41 +5,36 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid p-4">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header bg-danger text-white text-center py-4">
-                    <i class="fa-solid fa-user-slash fa-4x mb-3"></i>
-                    <h3 class="fw-bold mb-0">¿Eliminar Votante?</h3>
+
+                <div class="card-header bg-danger text-white p-4 text-center">
+                    <i class="fa-solid fa-user-xmark fa-3x mb-2 opacity-75"></i>
+                    <h3 class="fw-bold m-0">¿Eliminar Votante?</h3>
+                    <p class="mb-0 opacity-75 small">Esta acción no se puede deshacer.</p>
                 </div>
 
-                <div class="card-body p-5 text-center">
-                    <p class="text-muted fs-5 mb-4">
-                        Está a punto de eliminar permanentemente al siguiente usuario del padrón:
-                    </p>
+                <div class="card-body p-4 text-center">
 
-                    <div class="alert alert-light border rounded-3 p-3 mb-4">
+                    <div class="mb-4">
                         <h4 class="fw-bold text-dark mb-1">@Model.Nombres</h4>
-                        <p class="text-secondary mb-0">Cédula: @Model.Cedula</p>
+                        <p class="text-muted">C.I: @Model.Cedula</p>
                     </div>
 
-                    <p class="text-danger small fw-bold">
-                        <i class="fa-solid fa-triangle-exclamation me-1"></i>
-                        Esta acción no se puede deshacer.
-                    </p>
+                    <div class="alert alert-warning text-start small border-0 bg-warning bg-opacity-10 text-warning-emphasis">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        Si elimina este usuario, <b>no podrá votar</b>. Si ya votó, su voto permanecerá anónimo pero el registro del estudiante desaparecerá del padrón.
+                    </div>
 
-                    <form asp-action="Delete" id="formEliminarVotante">
+                    <form asp-action="Delete">
                         <input type="hidden" asp-for="Id" />
-
-                        <div class="d-grid gap-2 mt-4">
-                            @* Botón que activa la confirmación de SweetAlert *@
-                            <button type="button" onclick="confirmarEliminacion()" class="btn btn-danger btn-lg rounded-pill shadow-sm py-3 fw-bold">
-                                <i class="fa-solid fa-trash-can me-2"></i> Confirmar Eliminación
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg fw-bold rounded-pill">
+                                Sí, Eliminar del Padrón
                             </button>
-                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill border-0">
-                                Cancelar y Volver
-                            </a>
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill">Cancelar</a>
                         </div>
                     </form>
                 </div>
@@ -47,27 +42,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @* Asegúrate de que la URL de la librería esté bien escrita y cerrada *@
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
-        function confirmarEliminacion() {
-            Swal.fire({
-                title: '¿Estás absolutamente seguro?',
-                text: "El registro de @Model.Nombres será borrado definitivamente.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, eliminar permanentemente',
-                cancelButtonText: 'No, cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('formEliminarVotante').submit();
-                }
-            })
-        }
-    </script>
-}

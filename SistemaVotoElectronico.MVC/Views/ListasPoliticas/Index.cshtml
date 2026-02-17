@@ -2,9 +2,88 @@
 
 @{
     ViewData["Title"] = "Listas Políticas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<style>
+    /* Estilos para los botones de acción */
+    .custom-btn-group {
+        display: inline-flex;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        vertical-align: middle;
+    }
+
+    .btn-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 38px;
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+        border: none;
+        background: transparent;
+    }
+
+    .btn-edit {
+        color: #0d6efd;
+        border-right: 1px solid #dee2e6 !important;
+    }
+
+        .btn-edit:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+
+    .btn-details {
+        background-color: #00d4ff !important;
+        color: #000 !important;
+        width: 50px;
+    }
+
+        .btn-details:hover {
+            background-color: #00b8e6 !important;
+        }
+
+    .btn-delete {
+        color: #dc3545;
+        border-left: 1px solid #dee2e6 !important;
+    }
+
+        .btn-delete:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+    /* Estilo para la imagen redonda */
+    .logo-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #dee2e6;
+    }
+
+    /* Estilo para cuando NO hay imagen */
+    .logo-placeholder {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #adb5bd;
+        font-size: 1.2rem;
+        border: 2px solid #dee2e6;
+    }
+</style>
+
 <div class="container-fluid p-4">
+
+    @* --- ENCABEZADO --- *@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold text-dark">
@@ -17,6 +96,7 @@
         </a>
     </div>
 
+    @* --- TABLA --- *@
     <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -33,31 +113,72 @@
                         <tr>
                             <td class="ps-4">
                                 <div class="d-flex align-items-center">
-                                    <img src="@item.LogoUrl" class="rounded me-3 border"
-                                         style="width: 45px; height: 45px; object-fit: contain; background: #fff;"
-                                         onerror="this.src='https://placehold.co/45x45?text=Img';" />
+                                    <div class="me-3 position-relative">
+                                        @* LÓGICA DE IMAGEN ROBUSTA *@
+                                        @{
+                                            bool tieneImagen = !string.IsNullOrEmpty(item.LogoUrl);
+                                            string imagenSrc = item.LogoUrl;
 
-                                    <div class="d-flex flex-column">
-                                        <span class="fw-bold text-dark">@item.Nombre</span>
-                                        <small class="text-muted" style="font-size: 0.8rem;">
-                                            @(item.EventoElectoral != null ? item.EventoElectoral.Nombre : "Evento ID: " + item.EventoElectoralId)
+                                            // Si es Base64 sin cabecera, se la ponemos
+                                            if (tieneImagen && !imagenSrc.StartsWith("http") && !imagenSrc.StartsWith("data:image"))
+                                            {
+                                                imagenSrc = $"data:image/png;base64,{item.LogoUrl}";
+                                            }
+                                        }
+
+                                        @if (tieneImagen)
+                                        {
+                                            // 1. Intentamos mostrar la imagen
+                                            // Si falla (onerror), la ocultamos y mostramos el placeholder de abajo
+                                            <img src="@imagenSrc"
+                                                 class="logo-img shadow-sm"
+                                                 alt="Logo"
+                                                 id="img-@item.Id"
+                                                 onerror="this.style.display='none'; document.getElementById('placeholder-@item.Id').style.display='flex';" />
+
+                                            // 2. Placeholder oculto (se activa si la imagen falla)
+                                            <div id="placeholder-@item.Id" class="logo-placeholder shadow-sm" style="display: none;">
+                                                <i class="fa-solid fa-link-slash text-danger" title="Enlace roto"></i>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            // 3. Placeholder normal (si no había imagen)
+                                            <div class="logo-placeholder shadow-sm">
+                                                <i class="fa-solid fa-building-columns"></i>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-dark">@item.Nombre</h6>
+                                        <small class="text-muted">
+                                            @if (item.EventoElectoralId != 0)
+                                            {
+                                                <span><i class="fa-solid fa-calendar-check me-1"></i>Evento ID: @item.EventoElectoralId</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Sin evento asignado</span>
+                                            }
                                         </small>
                                     </div>
                                 </div>
                             </td>
-                            <td><span class="text-muted fst-italic">@item.Eslogan</span></td>
-                            <td class="text-center">
-                                <div class="btn-group shadow-sm rounded-3 overflow-hidden">
 
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm border-0 px-3" title="Ver Detalles">
+                            <td>
+                                <span class="fst-italic text-secondary">"@item.Eslogan"</span>
+                            </td>
+
+                            <td class="text-center">
+                                <div class="custom-btn-group shadow-sm">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Editar">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-action btn-details" title="Detalles">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
-
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm border-0 px-3" title="Editar">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm border-0 px-3" title="Eliminar">
-                                        <i class="fa-solid fa-trash"></i>
+                                    <a href="javascript:void(0);" onclick="confirmarEliminacionLista(@item.Id, '@item.Nombre')" class="btn-action btn-delete" title="Eliminar">
+                                        <i class="fa-solid fa-trash-can"></i>
                                     </a>
                                 </div>
                             </td>
@@ -65,14 +186,51 @@
                     }
                 </tbody>
             </table>
-
-            @if (!Model.Any())
-            {
-                <div class="text-center py-5">
-                    <i class="fa-solid fa-folder-open fa-3x text-muted mb-3 opacity-50"></i>
-                    <p class="text-muted fw-bold">No hay listas registradas aún.</p>
-                </div>
-            }
         </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fa-solid fa-flag fa-3x text-light mb-3"></i>
+                <p class="text-muted">No hay listas políticas registradas.</p>
+            </div>
+        }
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function confirmarEliminacionLista(idLista, nombreLista) {
+        Swal.fire({
+            html: `
+                <div style="background-color: #dc3545; color: white; padding: 25px 20px; border-radius: 10px 10px 0 0; margin: -25px -26px 20px -26px;">
+                    <i class="fa-solid fa-triangle-exclamation fa-4x mb-2"></i><br>
+                    <h3 class="fw-bold mt-2 text-white">¿Eliminar esta Lista?</h3>
+                </div>
+                <p class="text-muted mb-1">Se eliminará:</p>
+                <h2 class="text-danger fw-bold mb-3">${nombreLista}</h2>
+                <div class="alert alert-warning border-0 text-start shadow-sm" role="alert" style="background-color: #fff3cd; color: #856404; font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>
+                    <b>Advertencia:</b> Podría afectar a candidatos asociados.
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, Eliminar',
+            cancelButtonText: 'Cancelar',
+            customClass: { popup: 'rounded-4' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Usamos Post para seguridad si tienes el método en el controller
+                $.post('@Url.Action("Delete", "ListasPoliticas")', { id: idLista }, function(data) {
+                    location.reload();
+                }).fail(function() {
+                     Swal.fire('Error', 'No se pudo eliminar. Verifique que no tenga candidatos asociados.', 'error');
+                });
+            }
+        });
+    }
+</script>

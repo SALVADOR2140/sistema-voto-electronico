@@ -2,61 +2,98 @@
 
 @{
     ViewData["Title"] = "Editar Lista";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="card shadow border-0 rounded-4">
-        <div class="card-header bg-warning text-dark py-3">
-            <h4 class="mb-0 fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Editar Organización</h4>
-        </div>
-        <div class="card-body p-4">
-            <form asp-action="Edit">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="Id" />
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded-4">
+                <div class="card-header bg-warning bg-opacity-75 text-dark py-3">
+                    <h4 class="mb-0 fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i>Editar Organización</h4>
+                </div>
+                <div class="card-body p-4">
 
-                <div class="row">
-                    <div class="col-md-8">
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="LogoUrl" />
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Nombre</label>
-                            <input asp-for="Nombre" class="form-control" />
-                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                            <input asp-for="Nombre" class="form-control" required />
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Eslogan</label>
-                            <input asp-for="Eslogan" class="form-control" />
-                            <span asp-validation-for="Eslogan" class="text-danger"></span>
+                            <input asp-for="Eslogan" class="form-control" required />
                         </div>
+
+                        <div class="mb-4 p-3 bg-light rounded border">
+                            <label class="form-label fw-bold mb-3">Logotipo</label>
+
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto text-center">
+                                    <p class="small text-muted mb-1">Actual:</p>
+                                    @{
+                                        string imgActual = Model.LogoUrl;
+                                        if (!string.IsNullOrEmpty(imgActual) && !imgActual.StartsWith("http") && !imgActual.StartsWith("data:"))
+                                        {
+                                            imgActual = $"data:image/png;base64,{imgActual}";
+                                        }
+                                    }
+                                    <img src="@imgActual" class="rounded-circle shadow-sm border bg-white"
+                                         style="width: 80px; height: 80px; object-fit: cover;"
+                                         onerror="this.src='https://via.placeholder.com/80?text=IMG';" />
+                                </div>
+                                <div class="col">
+                                    <div class="alert alert-info py-2 small mb-0">
+                                        <i class="fa-solid fa-circle-info me-1"></i>
+                                        Si no selecciona una nueva imagen, se mantendrá la actual.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="btn-group w-100 mb-3" role="group">
+                                <input type="radio" class="btn-check" name="tipoCarga" id="radioArchivo" autocomplete="off" checked onchange="toggleInput('archivo')">
+                                <label class="btn btn-outline-primary btn-sm" for="radioArchivo">Subir Nueva</label>
+
+                                <input type="radio" class="btn-check" name="tipoCarga" id="radioUrl" autocomplete="off" onchange="toggleInput('url')">
+                                <label class="btn btn-outline-primary btn-sm" for="radioUrl">Pegar URL Nueva</label>
+                            </div>
+
+                            <div id="grupoArchivo">
+                                <input type="file" name="logoArchivo" class="form-control" accept="image/*">
+                            </div>
+
+                            <div id="grupoUrl" class="d-none">
+                                <input type="text" name="logoUrlTexto" class="form-control" placeholder="https://...">
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Evento Electoral</label>
                             <select asp-for="EventoElectoralId" class="form-select" asp-items="ViewBag.Eventos"></select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">URL del Logo</label>
-                            <input asp-for="LogoUrl" class="form-control" id="imgUrlInput" oninput="previewImage(this.value)" />
-                        </div>
-                    </div>
 
-                    <div class="col-md-4 text-center">
-                        <label class="form-label fw-bold text-muted">Vista Previa</label>
-                        <div class="p-3 border rounded bg-light">
-                            <img id="imgPreview" src="@Model.LogoUrl" class="img-fluid rounded"
-                                 style="max-height: 150px;"
-                                 onerror="this.src='https://placehold.co/150x150?text=Sin+Imagen';" />
+                        <div class="d-flex justify-content-center gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">Guardar Cambios</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary px-5 rounded-pill shadow-sm">Cancelar</a>
                         </div>
-                    </div>
+                    </form>
                 </div>
-
-                <div class="mt-4 border-top pt-3 text-end">
-                    <a asp-action="Index" class="btn btn-secondary me-2">Cancelar</a>
-                    <button type="submit" class="btn btn-warning fw-bold px-4">Guardar Cambios</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function previewImage(url) {
-        document.getElementById('imgPreview').src = url;
+    function toggleInput(tipo) {
+        if (tipo === 'archivo') {
+            document.getElementById('grupoArchivo').classList.remove('d-none');
+            document.getElementById('grupoUrl').classList.add('d-none');
+        } else {
+            document.getElementById('grupoArchivo').classList.add('d-none');
+            document.getElementById('grupoUrl').classList.remove('d-none');
+        }
     }
 </script>

@@ -8,7 +8,6 @@ namespace SistemaVotoElectronico.MVC.Controllers
     public class JuntasController : Controller
     {
         private readonly HttpClient _httpClient;
-
         private readonly string _apiBase = "http://localhost:5111/api";
 
         public JuntasController(IHttpClientFactory httpClientFactory)
@@ -26,47 +25,47 @@ namespace SistemaVotoElectronico.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> GenerarToken(string cedula)
         {
+            cedula = cedula?.Trim();
+
             if (string.IsNullOrEmpty(cedula))
             {
-                TempData["Error"] = "Por favor ingrese un número de cédula.";
+                TempData["Error"] = "Ingrese la cédula para validar.";
                 return RedirectToAction("Index");
             }
 
             try
             {
-                // 1. LLAMADA A LA API
                 var response = await _httpClient.PostAsync($"{_apiBase}/Usuarios/GenerarTokenManual?cedula={cedula}", null);
                 var jsonRespuesta = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var tokenObj = JToken.Parse(jsonRespuesta);
-                    string tokenGenerado = tokenObj["token"]?.ToString() ?? "TOKEN-OK";
-                    string nombreUsuario = tokenObj["nombre"]?.ToString() ?? "Ciudadano";
-
-                    TempData["TokenGenerado"] = tokenGenerado;
-                    TempData["MensajeExito"] = $"Token generado correctamente para: {nombreUsuario}";
+                    var jsonObj = JToken.Parse(jsonRespuesta);
+                    TempData["TokenGenerado"] = jsonObj["token"]?.ToString() ?? jsonObj["result"]?["token"]?.ToString();
+                    TempData["MensajeExito"] = $"Votante Habilitado: {jsonObj["nombre"] ?? jsonObj["result"]?["nombres"]}";
                 }
                 else
                 {
-
-                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest || response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    {
+                        TempData["Error"] = "🚫 Acceso denegado: El sistema central no permite el voto para este perfil o el formato es incorrecto.";
+                    }
+                    else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
                         TempData["Error"] = "🔍 Cédula no encontrada en el padrón electoral.";
                     }
                     else
                     {
-                        TempData["Error"] = "⚠️ Votante no encontrado. Verifique el número de cédula.";
+                        TempData["Error"] = "⚠️ Error de validación. Verifique los datos en el Padrón.";
                     }
                 }
             }
             catch (Exception)
             {
-                TempData["Error"] = "❌ No hay conexión con el servidor. Intente más tarde.";
+                TempData["Error"] = "❌ Error de conexión con el servidor central.";
             }
 
             return RedirectToAction("Index");
         }
-
     }
 }

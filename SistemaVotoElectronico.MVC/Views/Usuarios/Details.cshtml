@@ -5,58 +5,80 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid p-4">
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="fa-solid fa-id-card me-2 text-primary"></i>Detalles del Votante</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i>Volver
+        </a>
+    </div>
+
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header bg-dark text-white text-center py-4">
-                    <div class="rounded-circle bg-white text-dark d-inline-flex align-items-center justify-content-center mb-2" style="width: 80px; height: 80px;">
-                        <i class="fa-solid fa-user-tie fa-3x"></i>
+
+                <div class="card-header bg-gradient p-4 text-center text-white" style="background: linear-gradient(135deg, #6610f2 0%, #6f42c1 100%);">
+                    <div class="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow" style="width: 80px; height: 80px;">
+                        <i class="fa-solid fa-user fa-3x"></i>
                     </div>
-                    <h4 class="mb-0 fw-bold">Perfil del Usuario</h4>
+                    <h3 class="fw-bold m-0">@Model.Nombres</h3>
+                    <p class="opacity-75 mb-0">@Model.Correo</p>
                 </div>
 
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <tbody>
-                            <tr>
-                                <th class="ps-4 py-3 text-muted w-25">Cédula</th>
-                                <td class="py-3 fw-bold">@Model.Cedula</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 py-3 text-muted">Nombres</th>
-                                <td class="py-3">@Model.Nombres</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 py-3 text-muted">Correo</th>
-                                <td class="py-3 text-primary">@Model.Correo</td>
-                            </tr>
-                            <tr>
-                                <th class="ps-4 py-3 text-muted">Estado de Voto</th>
-                                <td class="py-3">
-                                    @if (Model.YaVoto)
-                                    {
-                                        <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> YA VOTÓ</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> PENDIENTE</span>
-                                    }
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <div class="card-body p-5">
 
-                <div class="card-footer bg-light p-4 text-center border-0">
-                    <div class="d-flex justify-content-center gap-2">
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 rounded-pill fw-bold">
-                            <i class="fa-solid fa-pen-to-square me-2"></i> Editar
+                    <div class="text-center mb-4">
+                        <h6 class="text-uppercase text-muted fw-bold small">Estado de Votación</h6>
+                        @if (Model.YaVoto)
+                        {
+                            <span class="badge bg-success px-3 py-2 rounded-pill">
+                                <i class="fa-solid fa-check-circle me-2"></i>Ya Votó
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                                <i class="fa-solid fa-clock me-2"></i>Pendiente
+                            </span>
+                        }
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border">
+                                <small class="text-muted d-block fw-bold">Cédula de Identidad</small>
+                                <span class="fs-5 text-dark fw-bold">@Model.Cedula</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded border">
+                                <small class="text-muted d-block fw-bold">Rol en Sistema</small>
+                                <span class="fs-5 text-dark fw-bold">
+                                    @(Model.RolUsuarioId == 1 ? "Administrador" : "Votante / Estudiante")
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded border">
+                                <small class="text-muted d-block fw-bold">Token de Votación (Temporal)</small>
+                                <code class="fs-5 text-primary fw-bold">@(Model.TokenVotacion ?? "N/A")</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-5 opacity-10">
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar
                         </a>
-                        <a asp-action="Index" class="btn btn-secondary px-4 rounded-pill">
-                            Volver al Padrón
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm">
+                            <i class="fa-solid fa-arrow-rotate-left me-2"></i>Volver
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>
