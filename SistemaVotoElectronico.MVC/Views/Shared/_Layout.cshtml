@@ -7,9 +7,7 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 </head>
 <body>
@@ -35,12 +33,6 @@
                     }
                 </span>
             </a>
-            <li class="nav-item">
-                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ListasPoliticas" ? "active" : "")"
-                   asp-controller="ListasPoliticas" asp-action="Index">
-                    <i class="fa-solid fa-flag me-2 text-primary"></i> Listas Políticas
-                </a>
-            </li>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenu">
                 <li><h6 class="dropdown-header">Mi Cuenta</h6></li>
                 <li><a class="dropdown-item" href="#">Perfil</a></li>
@@ -66,7 +58,7 @@
                     <i class="fa-solid fa-gauge-high"></i> Dashboard
                 </a>
 
-                @* 👇 NUEVA SECCIÓN UNIFICADA: MESA DE CONTROL 👇 *@
+                @* MESA DE CONTROL *@
                 <p class="text-uppercase text-muted small fw-bold px-4 mt-4 mb-2">Mesa de Control</p>
 
                 <a asp-controller="Juntas" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Juntas" ? "active" : "")">
@@ -79,6 +71,11 @@
                     <i class="fa-solid fa-calendar-check"></i> Eventos
                 </a>
 
+                @* --- IMPLEMENTACIÓN DE LISTAS POLÍTICAS AQUÍ --- *@
+                <a asp-controller="ListasPoliticas" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ListasPoliticas" ? "active" : "")">
+                    <i class="fa-solid fa-flag"></i> Listas Políticas
+                </a>
+
                 <a asp-controller="Candidatos" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Candidatos" ? "active" : "")">
                     <i class="fa-solid fa-user-tie"></i> Candidatos
                 </a>
@@ -87,8 +84,6 @@
                     <i class="fa-solid fa-users-gear"></i> Padrón (Votantes)
                 </a>
             }
-
-            @* (Opcional) Si quieres que el Candidato vea algo, agrega un if (Rol == 2) aquí *@
 
         </div>
     </nav>

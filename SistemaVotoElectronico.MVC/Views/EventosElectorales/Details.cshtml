@@ -5,34 +5,96 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container py-4">
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">
+                <i class="fa-solid fa-circle-info me-2 text-info"></i>Detalles del Evento
+            </h2>
+            <p class="text-muted mb-0">Información técnica y estado del proceso electoral.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-arrow-left me-2"></i>Volver al Listado
+        </a>
+    </div>
+
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header bg-dark text-white text-center py-4">
-                    <i class="fa-solid fa-calendar-check fa-3x mb-2"></i>
-                    <h4 class="mb-0 fw-bold">Información del Evento</h4>
+
+                <div class="card-header bg-gradient p-4 text-center text-white" style="background: linear-gradient(135deg, #0dcaf0 0%, #0d6efd 100%);">
+                    <i class="fa-solid fa-check-to-slot fa-4x mb-2 opacity-75"></i>
+                    <h2 class="fw-bold m-0">@Model.Nombre</h2>
+                    <p class="opacity-75 mb-0">ID de Referencia Interna: #@Model.Id</p>
                 </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <tbody>
-                            <tr><th class="ps-4 py-3 text-muted w-40">Nombre</th><td class="py-3 fw-bold">@Model.Nombre</td></tr>
-                            <tr><th class="ps-4 py-3 text-muted">Inicia</th><td class="py-3">@Model.FechaInicio.ToString("f")</td></tr>
-                            <tr><th class="ps-4 py-3 text-muted">Termina</th><td class="py-3">@Model.FechaFin.ToString("f")</td></tr>
-                            <tr>
-                                <th class="ps-4 py-3 text-muted">Estado</th>
-                                <td class="py-3">
-                                    <span class="badge @(Model.Activo ? "bg-success" : "bg-danger")">
-                                        @(Model.Activo ? "ACTIVO" : "INACTIVO")
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="card-footer bg-light p-4 text-center">
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 rounded-pill fw-bold">Editar</a>
-                    <a asp-action="Index" class="btn btn-secondary px-4 rounded-pill">Volver</a>
+
+                <div class="card-body p-5">
+
+                    <div class="text-center mb-5">
+                        <h6 class="text-muted text-uppercase fw-bold small ls-1">Estado en Tiempo Real</h6>
+                        @if (Model.Activo && Model.FechaFin > DateTime.Now)
+                        {
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success px-4 py-2 fs-6">
+                                <i class="fa-solid fa-circle-check me-2"></i>Proceso Activo
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary px-4 py-2 fs-6">
+                                <i class="fa-solid fa-circle-minus me-2"></i>Proceso Finalizado
+                            </span>
+                        }
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-3 bg-light border border-start border-4 border-primary h-100">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3 text-primary">
+                                        <i class="fa-regular fa-clock fa-lg"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-0 text-primary">Apertura de Urnas</h6>
+                                </div>
+                                <h5 class="mb-0 fw-bold text-dark ps-5">
+                                    @Model.FechaInicio.ToString("dd MMMM yyyy")
+                                </h5>
+                                <small class="text-muted ps-5 d-block">
+                                    Hora: @Model.FechaInicio.ToString("HH:mm tt")
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-3 bg-light border border-start border-4 border-danger h-100">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-danger bg-opacity-10 p-2 rounded-circle me-3 text-danger">
+                                        <i class="fa-regular fa-calendar-xmark fa-lg"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-0 text-danger">Cierre de Votación</h6>
+                                </div>
+                                <h5 class="mb-0 fw-bold text-dark ps-5">
+                                    @Model.FechaFin.ToString("dd MMMM yyyy")
+                                </h5>
+                                <small class="text-muted ps-5 d-block">
+                                    Hora: @Model.FechaFin.ToString("HH:mm tt")
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-5 opacity-10">
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Editar Información
+                        </a>
+
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm">
+                            <i class="fa-solid fa-arrow-rotate-left me-2"></i>Volver
+                        </a>
+                    </div>
+
                 </div>
             </div>
         </div>

@@ -15,32 +15,40 @@
                 <div class="card-body p-5">
                     <form asp-action="Create" autocomplete="off">
 
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
                         <div class="mb-4">
                             <label asp-for="Nombres" class="form-label fw-bold">Nombres Completos</label>
                             <input asp-for="Nombres" class="form-control" placeholder="Ej: Juan Pérez" required />
+                            <span asp-validation-for="Nombres" class="text-danger"></span>
                         </div>
 
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label asp-for="Cargo" class="form-label fw-bold">Cargo / Dignidad</label>
                                 <input asp-for="Cargo" class="form-control" placeholder="Ej: Rector" required />
+                                <span asp-validation-for="Cargo" class="text-danger"></span>
                             </div>
+
                             <div class="col-md-6">
                                 <label asp-for="ListaPoliticaId" class="form-label fw-bold">Asignar Lista</label>
-                                <select asp-for="ListaPoliticaId" class="form-select" asp-items="ViewBag.ListaPoliticaId">
+                                <select asp-for="ListaPoliticaId" class="form-select" asp-items="ViewBag.Listas" required>
                                     <option value="">-- Seleccione una Lista --</option>
                                 </select>
+                                <span asp-validation-for="ListaPoliticaId" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <label asp-for="FotoUrl" class="form-label fw-bold text-primary">URL de la Foto</label>
                             <input asp-for="FotoUrl" class="form-control" placeholder="https://link-de-imagen.jpg" />
+                            <span asp-validation-for="FotoUrl" class="text-danger"></span>
                         </div>
 
                         <div class="mb-4">
                             <label asp-for="PlanGobiernoUrl" class="form-label fw-bold text-success">URL del Plan de Gobierno (PDF)</label>
                             <input asp-for="PlanGobiernoUrl" class="form-control" placeholder="https://link-documento.pdf" />
+                            <span asp-validation-for="PlanGobiernoUrl" class="text-danger"></span>
                         </div>
 
                         <div class="d-grid gap-2 mt-5">
@@ -55,3 +63,9 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

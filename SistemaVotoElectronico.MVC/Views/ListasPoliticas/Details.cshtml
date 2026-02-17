@@ -2,23 +2,58 @@
 
 @{
     ViewData["Title"] = "Detalles de la Lista";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-center">
-                <div class="bg-dark py-4">
-                    <img src="@Model.LogoUrl" class="rounded bg-white p-2" style="height: 120px;">
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-primary text-white py-3">
+            <h4 class="mb-0 fw-bold"><i class="fa-solid fa-circle-info me-2"></i>Detalles de la Organización</h4>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center mb-4 mb-md-0">
+                    <div class="p-3 border rounded-3 bg-light shadow-sm d-inline-block">
+                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                        {
+                            <img src="@Model.LogoUrl" class="img-fluid rounded"
+                                 style="max-height: 200px; max-width: 100%; object-fit: contain;"
+                                 alt="Logo @Model.Nombre"
+                                 onerror="this.src='https://placehold.co/200x200?text=Sin+Imagen';" />
+                        }
+                        else
+                        {
+                            <div class="text-muted py-5 px-4">
+                                <i class="fa-solid fa-image fa-4x mb-2"></i>
+                                <p class="mb-0">Sin Logo Disponible</p>
+                            </div>
+                        }
+                    </div>
                 </div>
-                <div class="card-body p-5">
-                    <h2 class="fw-bold">@Model.Nombre</h2>
-                    <p class="text-muted fs-5 italic">"@Model.Eslogan"</p>
-                    <hr>
-                    <div class="d-flex justify-content-center gap-2">
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 rounded-pill fw-bold">Editar</a>
-                        <a asp-action="Index" class="btn btn-secondary px-4 rounded-pill">Volver</a>
+
+                <div class="col-md-8">
+                    <h2 class="fw-bold text-dark mb-1">@Model.Nombre</h2>
+                    <p class="text-muted fst-italic fs-5 mb-4">"@Model.Eslogan"</p>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="p-3 rounded-3 bg-light border-start border-4 border-primary">
+                                <small class="text-uppercase text-muted fw-bold">Evento Electoral Asignado</small>
+                                <div class="fs-5 fw-bold text-primary mt-1">
+                                    <i class="fa-solid fa-calendar-check me-2"></i>
+                                    @(Model.EventoElectoral != null ? Model.EventoElectoral.Nombre : "Evento ID: " + Model.EventoElectoralId)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 shadow-sm fw-bold">
+                            <i class="fa-solid fa-pen me-2"></i>Editar
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary px-4 shadow-sm">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Volver
+                        </a>
                     </div>
                 </div>
             </div>

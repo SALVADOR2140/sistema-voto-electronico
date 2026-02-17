@@ -5,8 +5,67 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<style>
+    /* Estilos personalizados para el grupo de botones de acciones */
+    .custom-btn-group {
+        display: inline-flex;
+        border: 2px solid #dee2e6; /* Borde gris exterior */
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        vertical-align: middle;
+    }
+
+    .btn-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 38px;
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+        border: none;
+        background: transparent;
+    }
+
+    /* Botón Editar (Izquierda) */
+    .btn-edit {
+        color: #0d6efd;
+        border-right: 1px solid #dee2e6 !important;
+    }
+
+        .btn-edit:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+
+    /* Botón Detalles (Centro - Resaltado en Cian) */
+    .btn-details {
+        background-color: #00d4ff !important; /* Color Cian exacto */
+        color: #000 !important; /* Ícono Negro */
+        width: 50px;
+    }
+
+        .btn-details:hover {
+            background-color: #00b8e6 !important;
+        }
+
+    /* Botón Eliminar (Derecha) */
+    .btn-delete {
+        color: #dc3545;
+        border-left: 1px solid #dee2e6 !important;
+    }
+
+        .btn-delete:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container-fluid p-4">
-    @* --- ENCABEZADO --- *@
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold text-dark">
@@ -19,7 +78,6 @@
         </a>
     </div>
 
-    @* --- RESUMEN DE INDICADORES --- *@
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card border-0 shadow-sm rounded-3 p-3 border-start border-primary border-5">
@@ -30,12 +88,11 @@
         <div class="col-md-3">
             <div class="card border-0 shadow-sm rounded-3 p-3 border-start border-success border-5">
                 <h6 class="text-muted small fw-bold text-uppercase mb-1">Eventos Activos</h6>
-                <h3 class="fw-bold mb-0 text-success">@Model.Count(e => e.Activo == true)</h3>
+                <h3 class="fw-bold mb-0 text-success">@Model.Count(e => e.Activo)</h3>
             </div>
         </div>
     </div>
 
-    @* --- TABLA DE GESTIÓN --- *@
     <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -64,8 +121,7 @@
                                 @item.FechaFin.ToString("dd/MM/yyyy HH:mm")
                             </td>
                             <td class="text-center">
-                                @* Corrección para el error de item.Estado detectado en consola *@
-                                @if (item.Activo == true)
+                                @if (item.Activo && item.FechaFin > DateTime.Now)
                                 {
                                     <span class="badge rounded-pill bg-success-subtle text-success border border-success px-3 py-2">
                                         <i class="fa-solid fa-circle-check me-1"></i> Activo
@@ -79,14 +135,16 @@
                                 }
                             </td>
                             <td class="text-center">
-                                <div class="btn-group shadow-sm rounded-3 overflow-hidden">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm border-0 py-2 px-3" title="Editar">
+                                <div class="custom-btn-group shadow-sm">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn-action btn-edit" title="Editar">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm border-0 py-2 px-3" title="Detalles">
+
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn-action btn-details" title="Detalles">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm border-0 py-2 px-3" title="Eliminar">
+
+                                    <a href="javascript:void(0);" onclick="confirmarEliminacion(@item.Id, '@item.Nombre')" class="btn-action btn-delete" title="Eliminar">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </a>
                                 </div>
@@ -104,5 +162,73 @@
                 <p class="text-muted">No se encontraron eventos electorales registrados.</p>
             </div>
         }
-    </div> 
-</div> 
+    </div>
+</div>
+
+<script>
+    function confirmarEliminacion(idEvento, nombreEvento) {
+        Swal.fire({
+            html: `
+                <div style="background-color: #dc3545; color: white; padding: 25px 20px; border-radius: 10px 10px 0 0; margin: -25px -26px 20px -26px;">
+                    <i class="fa-solid fa-triangle-exclamation fa-4x mb-2"></i><br>
+                    <h3 class="fw-bold mt-2 text-white">¿Eliminar este Evento?</h3>
+                </div>
+                <p class="text-muted mb-1">Estás a punto de eliminar permanentemente:</p>
+                <h2 class="text-danger fw-bold mb-3">${nombreEvento}</h2>
+                <div class="alert alert-warning border-0 text-start shadow-sm" role="alert" style="background-color: #fff3cd; color: #856404; font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>
+                    <b>Advertencia:</b> Esta acción no se puede deshacer. Se borrarán todos los candidatos y datos asociados a este evento.
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí, Eliminar',
+            cancelButtonText: 'Cancelar',
+            customClass: { popup: 'rounded-4' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                pedirContrasena(idEvento);
+            }
+        });
+    }
+
+    function pedirContrasena(idEvento) {
+        Swal.fire({
+            title: 'Seguridad Requerida',
+            text: "Confirme su identidad de Administrador para proceder.",
+            icon: 'lock',
+            input: 'password',
+            inputPlaceholder: 'Ingrese su contraseña',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Confirmar y Borrar',
+            cancelButtonText: 'Cancelar',
+            showLoaderOnConfirm: true,
+            preConfirm: (password) => {
+                return $.ajax({
+                    url: '@Url.Action("EliminarConfirmado", "EventosElectorales")',
+                    type: 'POST',
+                    data: { id: idEvento, password: password },
+                    success: function (response) {
+                        if (!response.success) {
+                            Swal.showValidationMessage(response.message || 'Error desconocido');
+                        }
+                        return response;
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.showValidationMessage("Error de conexión: " + error);
+                    }
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed && result.value.success) {
+                Swal.fire('¡Eliminado!', 'El evento ha sido eliminado.', 'success').then(() => {
+                    location.reload();
+                });
+            }
+        });
+    }
+</script>

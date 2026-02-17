@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemaVoto.Modelos; 
+using SistemaVoto.Modelos;
 
 namespace SistemaVotoElectronico.Api.Controllers
 {
@@ -17,80 +17,88 @@ namespace SistemaVotoElectronico.Api.Controllers
 
         public class IntencionVoto
         {
-            public string Token { get; set; }
+            public int UsuarioId { get; set; }
             public int EventoId { get; set; }
-            public int ListaId { get; set; } 
+            public int CandidatoId { get; set; }
         }
 
-        [HttpPost("Emitir")]
+        [HttpPost]
         public async Task<IActionResult> EmitirVoto([FromBody] IntencionVoto datos)
         {
-            if (datos == null || string.IsNullOrEmpty(datos.Token))
-                return BadRequest("Datos inválidos o token faltante.");
+            // LOG PARA DEBUG API
+            Console.WriteLine($"[API DEBUG] Recibiendo voto -> UsuarioID: {datos.UsuarioId}, Evento: {datos.EventoId}");
 
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.TokenVotacion == datos.Token);
+            if (datos.UsuarioId <= 0)
+                return BadRequest("ERROR: El ID del usuario es 0 o inválido.");
 
-            if (usuario == null) return Unauthorized("El Token ingresado no existe o no es válido.");
-            if (usuario.YaVoto) return BadRequest("Este usuario ya ejerció su voto.");
+            // 1. BUSCAR USUARIO
+            var usuario = await _context.Usuarios.FindAsync(datos.UsuarioId);
 
-            var evento = await _context.EventosElectorales.FindAsync(datos.EventoId);
-            if (evento == null || !evento.Activo) return BadRequest("El evento electoral no está activo.");
+            if (usuario == null)
+            {
+                Console.WriteLine("[API ERROR] Usuario no encontrado en BD.");
+                return NotFound("Usuario no existe en la base de datos.");
+            }
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            // 2. VERIFICAR SI YA VOTÓ
+            if (usuario.YaVoto)
+            {
+                Console.WriteLine($"[API ALERTA] El usuario {usuario.Id} intentó votar de nuevo.");
+                return BadRequest("El usuario YA TIENE un voto registrado.");
+            }
+
+            // 3. BUSCAR CANDIDATO
+            var candidato = await _context.Candidatos.FindAsync(datos.CandidatoId);
+            if (candidato == null) return BadRequest("Candidato no existe.");
+
             try
             {
+                // A. CREAR EL VOTO
                 var voto = new Voto
                 {
-                    Fecha = DateTime.Now, 
+                    Fecha = DateTime.Now,
                     EventoElectoralId = datos.EventoId,
-                    ListaPoliticaId = datos.ListaId,
+                    ListaPoliticaId = candidato.ListaPoliticaId,
                     HashSeguridad = Guid.NewGuid().ToString()
                 };
                 _context.Votos.Add(voto);
 
-                var certificado = new Certificado
-                {
-                    UsuarioId = usuario.Id,
-                    EventoElectoralId = datos.EventoId,
-                    FechaEmision = DateTime.Now,
-                    CodigoQR = Guid.NewGuid().ToString()
-                };
-                _context.Certificados.Add(certificado);
-
-                usuario.YaVoto = true;
-                usuario.TokenVotacion = null;
-                _context.Entry(usuario).State = EntityState.Modified;
-
+                // B. ACTUALIZAR RESULTADOS (Contador)
                 var resultado = await _context.ResultadosElecciones
-                    .FirstOrDefaultAsync(r => r.EventoElectoralId == datos.EventoId && r.ListaPoliticaId == datos.ListaId);
+                    .FirstOrDefaultAsync(r => r.EventoElectoralId == datos.EventoId && r.ListaPoliticaId == candidato.ListaPoliticaId);
 
                 if (resultado == null)
                 {
-                    resultado = new ResultadoEleccion
+                    _context.ResultadosElecciones.Add(new ResultadoEleccion
                     {
                         EventoElectoralId = datos.EventoId,
-                        ListaPoliticaId = datos.ListaId,
+                        ListaPoliticaId = candidato.ListaPoliticaId,
                         TotalVotos = 1
-                    };
-                    _context.ResultadosElecciones.Add(resultado);
+                    });
                 }
                 else
                 {
                     resultado.TotalVotos++;
-                    _context.Entry(resultado).State = EntityState.Modified;
                 }
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+                // C. QUEMAR TOKEN
+                _context.Usuarios.Attach(usuario);
 
-                return Ok(new { mensaje = "✅ Voto registrado y certificado generado exitosamente." });
+                usuario.YaVoto = true;
+                usuario.TokenVotacion = null;
+                _context.Entry(usuario).Property(u => u.YaVoto).IsModified = true;
+                _context.Entry(usuario).Property(u => u.TokenVotacion).IsModified = true;
+
+                // D. GUARDAR TODO
+                await _context.SaveChangesAsync();
+
+                Console.WriteLine("[API SUCCESS] Voto guardado y Token quemado.");
+                return Ok(new { mensaje = "Voto Exitoso" });
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                Console.WriteLine($"ERROR VOTO: {ex.Message}");
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                Console.WriteLine($"[API CRASH] {ex.Message}");
+                return StatusCode(500, $"Error Interno: {ex.Message} - {ex.InnerException?.Message}");
             }
         }
     }

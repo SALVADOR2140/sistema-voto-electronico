@@ -1,98 +1,91 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SistemaVoto.Modelos;
-using SistemaVotoElectronico.ApiConsumer;
-using SistemaVotoElectronico.MVC.Filtros;
+using System.Text;
 
 namespace SistemaVotoElectronico.MVC.Controllers
 {
-    [VerificarSesion] 
     public class CandidatosController : Controller
     {
-        // GET: Candidatos
-        public ActionResult Index()
+        private readonly HttpClient _httpClient;
+
+        private readonly string _apiCandidatos = "http://localhost:5111/api/Candidatos";
+        private readonly string _apiListas = "http://localhost:5111/api/ListasPoliticas";
+
+        public CandidatosController(IHttpClientFactory httpClientFactory)
         {
-            var data = Crud<Candidato>.ReadAll();
-            return View(data.Data ?? new List<Candidato>());
+            _httpClient = httpClientFactory.CreateClient();
         }
 
-        // GET: Candidatos/Details/5
-        public ActionResult Details(int id)
+        // 1. LISTADO DE CANDIDATOS
+        public async Task<IActionResult> Index()
         {
-            var data = Crud<Candidato>.ReadBy(id.ToString());
-            return View(data.Data);
+            var candidatos = await ObtenerListaDesdeApi<Candidato>(_apiCandidatos);
+            return View(candidatos);
         }
 
-        // 2. CREAR (VISTA) - Aquí cargamos el combo de listas
+        // 2. CREAR (VISTA)
         public async Task<IActionResult> Create()
         {
+            var listas = await ObtenerListaDesdeApi<ListaPolitica>(_apiListas);
+
+            ViewBag.Listas = new SelectList(listas, "Id", "Nombre");
+
             return View();
         }
 
-        // POST: Candidatos/Create
+        // 3. CREAR 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Candidato data)
+        public async Task<IActionResult> Create(Candidato candidato)
+        {
+            ModelState.Remove("ListaPolitica");
+
+            if (ModelState.IsValid)
+            {
+                var json = JsonConvert.SerializeObject(candidato);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                try
+                {
+                    var response = await _httpClient.PostAsync(_apiCandidatos, content);
+                    if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error de conexión: " + ex.Message);
+                }
+            }
+
+            var listas = await ObtenerListaDesdeApi<ListaPolitica>(_apiListas);
+            ViewBag.Listas = new SelectList(listas, "Id", "Nombre");
+
+            return View(candidato);
+        }
+
+        private async Task<IEnumerable<T>> ObtenerListaDesdeApi<T>(string url)
         {
             try
             {
-                data.ListaPolitica = null;
-                Crud<Candidato>.Create(data);
+                var response = await _httpClient.GetAsync(url);
+                if (!response.IsSuccessStatusCode) return new List<T>();
 
-                TempData["MensajeExito"] = $"¡El candidato {data.Nombres} se registró correctamente!";
+                var json = await response.Content.ReadAsStringAsync();
+                var token = JToken.Parse(json);
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Error: {ex.Message}");
-                return View(data);
-            }
-        }
+                if (token is JArray) return token.ToObject<IEnumerable<T>>();
 
-        // GET: Candidatos/Edit/5
-        public ActionResult Edit(int id)
-        {
-            var data = Crud<Candidato>.ReadBy(id.ToString());
-            return View(data.Data);
-        }
-
-        // POST: Candidatos/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Candidato data)
-        {
-            try
-            {
-                Crud<Candidato>.Update(id.ToString(), data);
-                return RedirectToAction(nameof(Index));
+                if (token is JObject)
+                {
+                    var propArray = ((JObject)token).Properties()
+                        .FirstOrDefault(p => p.Value.Type == JTokenType.Array);
+                    if (propArray != null) return propArray.Value.ToObject<IEnumerable<T>>();
+                }
             }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Candidatos/Delete/5
-        public ActionResult Delete(int id)
-        {
-            var data = Crud<Candidato>.ReadBy(id.ToString());
-            return View(data.Data);
-        }
-
-        // POST: Candidatos/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, Candidato data)
-        {
-            try
-            {
-                Crud<Candidato>.Delete(id.ToString());
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            catch { }
+            return new List<T>();
         }
     }
 }

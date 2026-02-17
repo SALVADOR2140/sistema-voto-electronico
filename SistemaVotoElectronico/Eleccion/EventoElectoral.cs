@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace SistemaVoto.Modelos
 {
@@ -22,5 +15,8 @@ namespace SistemaVoto.Modelos
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public bool Activo { get; set; }
+
+        [NotMapped]
+        public List<Candidato> Candidatos { get; set; } = new List<Candidato>();
     }
 }

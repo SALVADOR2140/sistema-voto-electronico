@@ -1,38 +1,52 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SistemaVoto.Modelos;
 using SistemaVotoElectronico.ApiConsumer;
-using SistemaVotoElectronico.Modelos;
-using SistemaVotoElectronico.MVC.Filtros;  
+using SistemaVotoElectronico.MVC.Filtros;
+
 
 namespace SistemaVotoElectronico.MVC.Controllers
 {
     public class EventosElectoralesController : Controller
     {
+        // 1. INYECCIÓN DE HTTP
+        private readonly HttpClient _httpClient;
+        private readonly string _apiBase = "https://localhost:7265/api";
+
+        public EventosElectoralesController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient();
+        }
+
         [VerificarSesion]
-        // GET: EventosElectorales
         public ActionResult Index()
         {
-            // 1. Traemos la lista de la API
-            var data = Crud<EventoElectoral>.ReadAll();
+            // 1. Traer todos los eventos
+            var respuesta = Crud<EventoElectoral>.ReadAll();
+            var eventos = respuesta.Data ?? new List<EventoElectoral>();
 
-            // 2. Calcular las estadísticas
-            if (data.Data != null && data.Data.Count > 0)
+            bool huboCambios = false;
+            DateTime ahora = DateTime.Now;
+
+            foreach (var evento in eventos)
             {
-                var total = data.Data.Count;
-                ViewBag.Total = total;
-                ViewData["Total"] = total;
-
-                ViewBag.Promedio = data.Data.Average(e => e.Id);
-                ViewBag.Minimo = data.Data.Min(e => e.Id);
-                ViewBag.Maximo = data.Data.Max(e => e.Id);
+                if (evento.Activo && evento.FechaFin < ahora)
+                {
+                    evento.Activo = false;
+                    try
+                    {
+                        Crud<EventoElectoral>.Update(evento.Id.ToString(), evento);
+                        huboCambios = true;
+                    }
+                    catch { /* Silenciar errores de red temporales */ }
+                }
             }
-            else
+
+            if (huboCambios)
             {
-                ViewBag.Total = 0;
-                ViewBag.Promedio = 0;
-                ViewBag.Minimo = 0;
-                ViewBag.Maximo = 0;
+                respuesta = Crud<EventoElectoral>.ReadAll();
+                eventos = respuesta.Data ?? new List<EventoElectoral>();
             }
 
             // 2. Estadísticas para los indicadores de la vista
@@ -45,17 +59,21 @@ namespace SistemaVotoElectronico.MVC.Controllers
         // GET: EventosElectorales/Details/5
         public ActionResult Details(int id)
         {
-            var data = Crud<EventoElectoral>.ReadBy(id.ToString());
-            return View(data.Data);
+            try
+            {
+                var response = Crud<EventoElectoral>.ReadBy(id.ToString());
+                if (response.Data == null) return RedirectToAction(nameof(Index));
+
+                return View(response.Data);
+            }
+            catch
+            {
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        // GET: EventosElectorales/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
+        public ActionResult Create() => View();
 
-        // POST: EventosElectorales/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(EventoElectoral data)
@@ -64,24 +82,14 @@ namespace SistemaVotoElectronico.MVC.Controllers
             {
                 if (data.FechaInicio == DateTime.MinValue) data.FechaInicio = DateTime.Now;
                 if (data.FechaFin == DateTime.MinValue) data.FechaFin = DateTime.Now.AddDays(1);
-
                 Crud<EventoElectoral>.Create(data);
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            catch { return View(); }
         }
 
-        // GET: EventosElectorales/Edit/5
-        public ActionResult Edit(int id)
-        {
-            var data = Crud<EventoElectoral>.ReadBy(id.ToString());
-            return View(data.Data);
-        }
+        public ActionResult Edit(int id) => View(Crud<EventoElectoral>.ReadBy(id.ToString()).Data);
 
-        // POST: EventosElectorales/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, EventoElectoral data)
@@ -91,32 +99,64 @@ namespace SistemaVotoElectronico.MVC.Controllers
                 Crud<EventoElectoral>.Update(id.ToString(), data);
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            catch { return View(); }
         }
 
-        // GET: EventosElectorales/Delete/5
-        public ActionResult Delete(int id)
-        {
-            var data = Crud<EventoElectoral>.ReadBy(id.ToString());
-            return View(data.Data);
-        }
-
-        // POST: EventosElectorales/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, EventoElectoral data)
+        public async Task<ActionResult> EliminarConfirmado(int id, string password)
         {
             try
             {
+                var response = await _httpClient.GetAsync($"{_apiBase}/Usuarios");
+                bool autorizado = false;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    List<Usuario> usuarios = null;
+
+                    try
+                    {
+                        usuarios = JsonConvert.DeserializeObject<List<Usuario>>(json);
+                    }
+                    catch
+                    {
+                        var wrapper = JsonConvert.DeserializeObject<dynamic>(json);
+                        try { usuarios = wrapper.result.ToObject<List<Usuario>>(); } catch { }
+                        if (usuarios == null) try { usuarios = wrapper.data.ToObject<List<Usuario>>(); } catch { }
+                    }
+
+                    if (usuarios != null)
+                    {
+                        var admin = usuarios.FirstOrDefault(u => u.Clave == password);
+                        if (admin != null) autorizado = true;
+                    }
+                }
+
+                if (!autorizado)
+                {
+                    for (int i = 1; i <= 200; i++)
+                    {
+                        var res = Crud<Usuario>.ReadBy(i.ToString());
+                        if (res.Data != null && res.Data.Clave == password)
+                        {
+                            autorizado = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!autorizado)
+                {
+                    return Json(new { success = false, message = "⛔ Contraseña incorrecta o nivel de acceso insuficiente." });
+                }
+
                 Crud<EventoElectoral>.Delete(id.ToString());
-                return RedirectToAction(nameof(Index));
+                return Json(new { success = true, message = "Evento eliminado correctamente." });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return Json(new { success = false, message = "Error interno del servidor: " + ex.Message });
             }
         }
     }

@@ -2,62 +2,125 @@
 
 @{
     ViewData["Title"] = "Centro de Votación";
-    // ESTA ES LA LÍNEA QUE FALTA PARA QUITAR AL ADMIN:
-    Layout = "~/Views/Shared/_LayoutVotante.cshtml";
 }
 
-<div class="text-center mb-5 mt-4">
-    <h1 class="display-4 fw-bold">🗳️ Centro de Votación</h1>
-    <p class="lead">Seleccione una elección activa para emitir su voto</p>
+<style>
+    .voting-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%);
+        color: white;
+        padding: 4rem 0 5rem; 
+        margin-bottom: -3rem; 
+        border-radius: 0 0 50% 50% / 20px; 
+    }
+
+    .election-card {
+        border: none;
+        border-radius: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+
+        .election-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,0.15) !important;
+        }
+
+    .btn-vote {
+        background: linear-gradient(45deg, #198754, #20c997);
+        border: none;
+        transition: all 0.3s;
+    }
+
+        .btn-vote:hover {
+            background: linear-gradient(45deg, #146c43, #198754);
+            transform: scale(1.02);
+        }
+
+    .status-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 0.8rem;
+    }
+</style>
+
+<div class="voting-header text-center">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-2">
+            <i class="fa-solid fa-check-to-slot me-3"></i>Centro de Votación
+        </h1>
+        <p class="lead opacity-75">Sistema Electoral Universitario Oficial</p>
+        <p class="small opacity-50">Por favor, seleccione una elección activa para emitir su derecho al voto.</p>
+    </div>
 </div>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        <h3>🛑 ALGO SALIÓ MAL:</h3>
-        <p>@TempData["Error"]</p>
-    </div>
-}
+<div class="container pb-5">
+    <div class="row justify-content-center">
 
-@if (TempData["MensajeVoto"] != null)
-{
-    <div class="alert alert-success">
-        <h3>✅ ÉXITO:</h3>
-        <p>@TempData["MensajeVoto"]</p>
-    </div>
-}
-
-<div class="row justify-content-center">
-    @if (!Model.Any())
-    {
-        <div class="col-md-6">
-            <div class="alert alert-warning text-center shadow-sm">
-                <h4><i class="fa-solid fa-triangle-exclamation"></i> No hay elecciones activas</h4>
-                <p>Por favor, espere a que el administrador habilite un nuevo evento.</p>
-            </div>
-        </div>
-    }
-    else
-    {
-        @foreach (var item in Model)
+        @if (!Model.Any())
         {
-            <div class="col-md-5 mb-4">
-                <div class="card shadow-lg border-0 h-100">
-                    <div class="card-header bg-primary text-white text-center py-3">
-                        <h5 class="m-0 fw-bold">ELECCIÓN OFICIAL</h5>
-                    </div>
-                    <div class="card-body text-center p-4">
-                        <h3 class="card-title text-primary">@item.Nombre</h3>
-                        <p class="text-muted">
-                            <i class="fa-regular fa-clock"></i> Cierre: @item.FechaFin.ToString("dd/MMM HH:mm")
-                        </p>
-                        <hr />
-                        <a href="@Url.Action("Papeleta", "Votacion", new { idEvento = item.Id })" class="btn btn-success btn-lg w-100 rounded-pill">
-                            ENTRAR AL CUARTO OSCURO <i class="fa-solid fa-person-booth ms-2"></i>
-                        </a>
-                    </div>
+            <div class="col-md-6 mt-5 text-center">
+                <div class="card shadow-sm p-5 border-0 rounded-4">
+                    <i class="fa-solid fa-calendar-xmark fa-4x text-muted mb-3"></i>
+                    <h4>No hay elecciones activas</h4>
+                    <p class="text-muted">Actualmente no hay procesos electorales habilitados para su perfil.</p>
                 </div>
             </div>
         }
-    }
+        else
+        {
+            @foreach (var evento in Model)
+            {
+                <div class="col-md-6 col-lg-5">
+                    <div class="card election-card shadow-lg mt-3">
+
+                        <div class="status-badge">
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2">
+                                <i class="fa-solid fa-circle fa-beat-fade me-2" style="--fa-animation-duration: 2s;"></i>Habilitada
+                            </span>
+                        </div>
+
+                        <div class="card-body p-5 text-center">
+                            <div class="mb-4">
+                                <div class="d-inline-block p-3 rounded-circle bg-primary bg-opacity-10 text-primary">
+                                    <i class="fa-solid fa-landmark fa-3x"></i>
+                                </div>
+                            </div>
+
+                            <h3 class="fw-bold text-dark mb-2">@evento.Nombre</h3>
+                            <p class="text-muted mb-4 small">Seleccione esta opción para elegir autoridades del periodo actual.</p>
+
+                            <div class="d-flex justify-content-center gap-2 mb-4">
+                                <div class="bg-light px-3 py-2 rounded border">
+                                    <i class="fa-regular fa-clock text-warning me-2"></i>
+                                    <small class="fw-bold text-secondary">Cierre: @evento.FechaFin.ToString("HH:mm")</small>
+                                </div>
+                            </div>
+
+                            <a asp-action="Papeleta" asp-route-idEvento="@evento.Id" class="btn btn-vote btn-lg w-100 text-white fw-bold py-3 rounded-pill shadow-sm">
+                                ENTRAR AL CUARTO OSCURO <i class="fa-solid fa-person-booth ms-2"></i>
+                            </a>
+
+                            <div class="mt-4 border-top pt-3">
+                                <small class="text-muted fst-italic d-flex align-items-center justify-content-center">
+                                    <i class="fa-solid fa-shield-halved text-success me-2"></i>
+                                    Su voto es secreto, anónimo y encriptado.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-light text-center py-2 border-0">
+                            <small class="text-muted" style="font-size: 0.7rem;">UNIVERSIDAD TÉCNICA DEL NORTE &copy; 2026</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
 </div>
+
+<script>
+    setTimeout(function() {
+        location.reload();
+    }, 30000); // 30000 milisegundos = 30 segundos
+</script>

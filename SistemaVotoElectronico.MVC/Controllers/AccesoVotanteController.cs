@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using SistemaVoto.Modelos; 
+using SistemaVoto.Modelos;
+
 namespace SistemaVotoElectronico.MVC.Controllers
 {
     public class AccesoVotanteController : Controller
     {
-        // 1. PANTALLA PARA ESCRIBIR EL TOKEN
         [HttpGet]
         public IActionResult Login()
         {
-            HttpContext.Session.Clear(); // Limpia cualquier sesión previa
+            HttpContext.Session.Clear();
             return View();
         }
 
-        // 2. RECIBE EL TOKEN Y LO VALIDA CON LA API
         [HttpPost]
         public async Task<IActionResult> Ingresar(string tokenIngresado)
         {
@@ -27,30 +26,36 @@ namespace SistemaVotoElectronico.MVC.Controllers
             {
                 using (var client = new HttpClient())
                 {
-                    // Ajusta el puerto si tu API no está en el 5111
                     string urlApi = "http://localhost:5111/api/Usuarios";
-
                     var response = await client.GetAsync(urlApi);
 
                     if (response.IsSuccessStatusCode)
                     {
                         var json = await response.Content.ReadAsStringAsync();
-                        var listaUsuarios = JsonConvert.DeserializeObject<List<Usuario>>(json);
+                        var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(json);
 
-                        // BUSCAMOS AL DUEÑO DEL TOKEN
-                        var votante = listaUsuarios.FirstOrDefault(u => u.TokenVotacion == tokenIngresado.Trim());
+                        // Buscamos el token
+                        var votante = usuarios.FirstOrDefault(u => u.TokenVotacion != null && u.TokenVotacion.Trim() == tokenIngresado.Trim());
 
                         if (votante != null)
                         {
                             // 1. VALIDACIÓN: ¿Ya votó?
                             if (votante.YaVoto)
                             {
-                                ViewBag.Error = "⛔ Este token ya fue utilizado. No puede volver a votar.";
+                                ViewBag.Error = "⛔ Este token YA fue utilizado. No puede volver a votar.";
                                 return View("Login");
                             }
 
-                            // ¡GUARDAMOS EL TOKEN EN LA MEMORIA (SESIÓN)
-                            HttpContext.Session.SetString("TokenVotante", votante.TokenVotacion);
+                            // 2. VALIDACIÓN: ¿Tiene ID válido?
+                            if (votante.Id <= 0)
+                            {
+                                ViewBag.Error = "⚠️ Error de datos: El usuario tiene ID 0.";
+                                return View("Login");
+                            }
+
+                            // 3. ÉXITO: GUARDAMOS EN SESIÓN
+                            HttpContext.Session.SetString("IdUsuarioLogueado", votante.Id.ToString());
+                            HttpContext.Session.SetString("EmailUsuario", votante.Correo ?? "");
 
                             return RedirectToAction("Index", "Votacion");
                         }

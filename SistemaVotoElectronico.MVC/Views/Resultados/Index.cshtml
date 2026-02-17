@@ -1,0 +1,109 @@
+﻿@model IEnumerable<SistemaVoto.Modelos.ResultadoLista>
+
+@{
+    ViewData["Title"] = "Resultados Electorales";
+}
+
+<div class="container-fluid p-4">
+    <h2 class="fw-bold mb-4 text-center">
+        <i class="fa-solid fa-chart-pie me-2 text-primary"></i>Resultados Oficiales (Método Webster)
+    </h2>
+
+    <div class="row">
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow border-0 rounded-4 h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-muted">Distribución de Escaños</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoWebster" style="max-height: 400px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow border-0 rounded-4 h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold">Detalle Numérico</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Lista</th>
+                                    <th class="text-center">Votos</th>
+                                    <th class="text-center fw-bold text-primary">Escaños</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge rounded-circle me-2" style="background-color:@item.Color; width:15px; height:15px;">&nbsp;</span>
+                                                <span class="fw-bold">@item.NombreLista</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">@item.TotalVotos.ToString("N0")</td>
+                                        <td class="text-center fw-bold fs-5">@item.EscañosGanados</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Obtenemos los datos del Modelo de C# a JavaScript
+        var nombres = @Html.Raw(Json.Serialize(Model.Select(m => m.NombreLista)));
+        var escaños = @Html.Raw(Json.Serialize(Model.Select(m => m.EscañosGanados)));
+        var votos = @Html.Raw(Json.Serialize(Model.Select(m => m.TotalVotos)));
+        var colores = @Html.Raw(Json.Serialize(Model.Select(m => m.Color)));
+
+        // Configuración del Gráfico
+        var ctx = document.getElementById('graficoWebster').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar', // Puedes cambiar a 'pie' o 'doughnut' si prefieres circular
+            data: {
+                labels: nombres,
+                datasets: [{
+                    label: 'Escaños Ganados',
+                    data: escaños,
+                    backgroundColor: colores,
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                // Muestra los votos totales al pasar el mouse
+                                return "Votos Totales: " + votos[context.dataIndex];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 } // Para que no salgan decimales en los escaños
+                    }
+                }
+            }
+        });
+    });
+</script>

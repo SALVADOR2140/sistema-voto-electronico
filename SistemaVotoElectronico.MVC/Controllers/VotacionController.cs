@@ -1,115 +1,155 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json; // Necesitarás este using arriba. Si sale rojo, avísame.
-using SistemaVoto.Modelos;
-using SistemaVotoElectronico.ApiConsumer;
-using SistemaVotoElectronico.Modelos;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Text;
+using SistemaVoto.Modelos;
+using SistemaVotoElectronico.Api.Servicios;
 
 namespace SistemaVotoElectronico.MVC.Controllers
 {
     public class VotacionController : Controller
     {
-        public async Task<ActionResult> Papeleta(int idEvento)
+        private readonly HttpClient _httpClient;
+        private readonly IEmailService _emailService;
+        private readonly string _apiBase = "http://localhost:5111/api";
+
+        public VotacionController(IHttpClientFactory httpClientFactory, IEmailService emailService)
         {
-            List<Candidato> listaCandidatos = new List<Candidato>();
-
-            try
-            {
-                // 1. Conectamos DIRECTO a la API (Sin intermediarios)
-                using (var client = new HttpClient())
-                {
-                    // Ajusta esta URL si tu puerto es diferente
-                    string urlApi = "http://127.0.0.1:5111/api/Candidatos";
-
-                    var response = await client.GetAsync(urlApi);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        // Leemos la respuesta "cruda" como texto
-                        var jsonString = await response.Content.ReadAsStringAsync();
-
-                        // Intentamos convertir ese texto en una lista de candidatos
-                        listaCandidatos = JsonConvert.DeserializeObject<List<Candidato>>(jsonString);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Si falla, no explotamos, solo seguimos con la lista vacía
-                Console.WriteLine("Error leyendo API: " + ex.Message);
-            }
-
-            ViewBag.EventoId = idEvento;
-            return View(listaCandidatos ?? new List<Candidato>());
-        }
-        // 1. PANTALLA DE BIENVENIDA AL VOTO (Elige la elección)
-        public ActionResult Index()
-        {
-            // 1. Traemos la lista cruda de la API
-            var respuesta = Crud<EventoElectoral>.ReadAll();
-
-            // 2. Si la API devolvió algo, lo usamos. Si no, lista vacía.
-            var listaEventos = respuesta.Data ?? new List<EventoElectoral>();
-
-            // --- COMENTAMOS O BORRAMOS EL FILTRO DE FECHAS PARA PROBAR ---
-            // var activos = listaEventos.Where(e => e.Activo && ...).ToList(); 
-
-            // 3. Mandamos TODO a la vista
-            return View(listaEventos);
+            _httpClient = httpClientFactory.CreateClient();
+            _emailService = emailService;
         }
 
-
-        [HttpPost]
-        public async Task<ActionResult> Votar(int idLista, int idEvento)
+        public async Task<IActionResult> Index()
         {
-            try
+            string idUsuario = HttpContext.Session.GetString("IdUsuarioLogueado");
+            if (string.IsNullOrEmpty(idUsuario)) return RedirectToAction("Login", "AccesoVotante");
+
+            var eventos = await ObtenerDatosApi<EventoElectoral>($"{_apiBase}/EventosElectorales");
+
+            var eventosDisponibles = eventos.Where(e =>
+                e.Activo == true &&
+                e.FechaInicio <= DateTime.Now &&
+                e.FechaFin > DateTime.Now        
+            ).ToList();
+
+            return View(eventosDisponibles);
+        }
+
+        public async Task<IActionResult> Papeleta(int idEvento)
+        {
+            string idUsuario = HttpContext.Session.GetString("IdUsuarioLogueado");
+            if (string.IsNullOrEmpty(idUsuario)) return RedirectToAction("Login", "AccesoVotante");
+
+            var evento = await ObtenerUnico<EventoElectoral>($"{_apiBase}/EventosElectorales/{idEvento}");
+
+                       if (evento == null || evento.FechaFin < DateTime.Now)
             {
-                // 1. Recuperamos el Token de la sesión
-                string tokenUsuario = HttpContext.Session.GetString("TokenVotante");
-
-                if (string.IsNullOrEmpty(tokenUsuario))
-                {
-                    TempData["Error"] = "Error de seguridad: No hay token en la sesión.";
-                    return RedirectToAction("Index");
-                }
-
-                // 2. Creamos el objeto EXACTO que pide tu API (IntencionVoto)
-                var datosVoto = new
-                {
-                    Token = tokenUsuario,
-                    EventoId = idEvento,
-                    ListaId = idLista
-                };
-
-                // 3. Enviamos a la API
-                using (var client = new HttpClient())
-                {
-                    string urlApi = "http://localhost:5111/api/Votos/Emitir";
-
-                    var json = JsonConvert.SerializeObject(datosVoto);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    var response = await client.PostAsync(urlApi, content);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        HttpContext.Session.Clear();
-                        TempData["MensajeVoto"] = "¡Voto Exitoso! Se ha generado su certificado.";
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        var errorMsg = await response.Content.ReadAsStringAsync();
-                        TempData["Error"] = $"Error: {errorMsg}";
-                        return RedirectToAction("Index");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Error crítico: " + ex.Message;
+                TempData["Error"] = "El tiempo de votación ha finalizado.";
                 return RedirectToAction("Index");
             }
+
+            var todasListas = await ObtenerDatosApi<ListaPolitica>($"{_apiBase}/ListasPoliticas");
+            var todosCandidatos = await ObtenerDatosApi<Candidato>($"{_apiBase}/Candidatos");
+
+            if (evento != null)
+            {
+                var idsListas = todasListas.Where(l => l.EventoElectoralId == idEvento).Select(l => l.Id).ToList();
+                evento.Candidatos = todosCandidatos.Where(c => idsListas.Contains(c.ListaPoliticaId)).ToList();
+            }
+            return View(evento);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Votar(int idCandidato, int idEvento)
+        {
+            string idUsuarioString = HttpContext.Session.GetString("IdUsuarioLogueado");
+            string emailUsuario = HttpContext.Session.GetString("EmailUsuario");
+
+            // Validación de sesión
+            if (string.IsNullOrEmpty(idUsuarioString)) return RedirectToAction("Login", "AccesoVotante");
+
+            if (idEvento == 0)
+            {
+                TempData["Error"] = "Error: No se identificó el evento electoral.";
+                return RedirectToAction("Index");
+            }
+
+            var eventoCheck = await ObtenerUnico<EventoElectoral>($"{_apiBase}/EventosElectorales/{idEvento}");
+            if (eventoCheck != null && eventoCheck.FechaFin < DateTime.Now)
+            {
+                TempData["Error"] = "⚠️ Lo sentimos, el tiempo de votación terminó justo ahora.";
+                return RedirectToAction("Index");
+            }
+
+            var votoData = new
+            {
+                UsuarioId = int.Parse(idUsuarioString),
+                EventoId = idEvento,
+                CandidatoId = idCandidato
+            };
+
+            var content = new StringContent(JsonConvert.SerializeObject(votoData), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync($"{_apiBase}/Votos", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // 1. Enviar Correo
+                if (!string.IsNullOrEmpty(emailUsuario))
+                {
+                    _ = Task.Run(() => _emailService.EnviarCertificado(emailUsuario, "Estudiante", "Elecciones 2026"));
+                }
+
+                // 2. CERRAR SESIÓN 
+                HttpContext.Session.Clear();
+
+                // 3. Redirigir al Inicio con mensaje de éxito
+                TempData["VotoExitoso"] = "true";
+                return RedirectToAction("Index", "Inicio");
+            }
+            else
+            {
+                var errorApi = await response.Content.ReadAsStringAsync();
+                TempData["Error"] = $"No se pudo registrar el voto: {errorApi}";
+                return RedirectToAction("Papeleta", new { idEvento = idEvento });
+            }
+        }
+
+        private async Task<List<T>> ObtenerDatosApi<T>(string url)
+        {
+            try
+            {
+                var json = await _httpClient.GetStringAsync(url);
+                var token = JToken.Parse(json);
+                if (token is JArray) return token.ToObject<List<T>>();
+                if (token is JObject && token["result"] != null) return token["result"].ToObject<List<T>>();
+                if (token is JObject && token["data"] != null) return token["data"].ToObject<List<T>>();
+                if (token is JObject) return new List<T> { token.ToObject<T>() };
+            }
+            catch { }
+            return new List<T>();
+        }
+
+        private async Task<T> ObtenerUnico<T>(string url)
+        {
+            try
+            {
+                var json = await _httpClient.GetStringAsync(url);
+                var token = JToken.Parse(json);
+
+                if (token is JObject && token["result"] != null)
+                    return token["result"].ToObject<T>();
+
+                if (token is JObject && token["data"] != null)
+                    return token["data"].ToObject<T>();
+
+                return JsonConvert.DeserializeObject<T>(json);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al leer API: {ex.Message}");
+            }
+            return default(T);
         }
     }
 }

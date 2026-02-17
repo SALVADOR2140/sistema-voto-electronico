@@ -1,50 +1,124 @@
-﻿@model IEnumerable<SistemaVoto.Modelos.Candidato>
+﻿@model SistemaVoto.Modelos.EventoElectoral
 
 @{
     ViewData["Title"] = "Papeleta Electoral";
-    int eventoId = ViewBag.EventoId;
 }
 
-<div class="container">
-    <div class="text-center mb-5">
-        <h2 class="display-5">Elija su Candidato</h2>
-        <p class="text-muted">Su voto es secreto y seguro.</p>
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
-        @foreach (var candidato in Model)
+<style>
+    body {
+        background-color: #f8f9fc;
+    }
+
+    .candidate-card {
+        border: none;
+        border-radius: 1.5rem;
+        background: white;
+        transition: transform 0.3s;
+    }
+
+        .candidate-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,0.175) !important;
+        }
+
+    .photo-wrapper {
+        width: 140px;
+        height: 140px;
+        margin: 0 auto;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid #4e73df;
+    }
+
+    .candidate-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .btn-vote-action {
+        background: #4e73df;
+        border: none;
+        border-radius: 50px;
+        padding: 10px 0;
+        font-weight: bold;
+    }
+
+        .btn-vote-action:hover {
+            background: #224abe;
+        }
+</style>
+
+<div class="text-center py-4 bg-white shadow-sm mb-4 border-bottom border-primary">
+    <h5 class="text-uppercase text-muted fw-bold">Elección Oficial</h5>
+    <h1 class="fw-bolder text-dark">@Model.Nombre</h1>
+    <small class="text-muted">ID Evento: @Model.Id</small>
+</div>
+
+<div class="container pb-5">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger text-center shadow-sm">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["Error"]
+        </div>
+    }
+
+    <div class="row g-4 justify-content-center">
+        @foreach (var candidato in Model.Candidatos)
         {
-            <div class="col">
-                <div class="card h-100 shadow border-2 hover-effect">
-                    <img src="@candidato.FotoUrl" class="card-img-top p-3 rounded-circle mx-auto d-block" alt="@candidato.Nombres" style="width: 180px; height: 180px; object-fit: cover;">
-
-                    <div class="card-body text-center">
-                        <h4 class="card-title fw-bold">@candidato.Nombres</h4>
-                        <h5 class="text-primary">@candidato.Cargo</h5>
-                        <span class="badge bg-secondary mb-3">Lista @candidato.ListaPoliticaId</span>
-
-                        <br />
-                        <a href="@candidato.PlanGobiernoUrl" target="_blank" class="btn btn-link btn-sm">Ver Plan de Gobierno</a>
+            <div class="col-md-6 col-lg-4">
+                <div class="card candidate-card shadow h-100 py-4 px-3">
+                    <div class="text-center mb-3">
+                        <div class="photo-wrapper mb-3">
+                            <img src="@candidato.FotoUrl" class="candidate-photo"
+                                 onerror="this.src='https://placehold.co/150x150?text=Foto';" />
+                        </div>
+                        <span class="badge bg-light text-dark border">LISTA @candidato.ListaPoliticaId</span>
                     </div>
 
-                    <div class="card-footer bg-white border-top-0 pb-4 text-center">
-                        <form asp-action="Votar" method="post">
+                    <div class="card-body text-center pt-0">
+                        <h3 class="fw-bold mb-1">@candidato.Nombres</h3>
+                        <p class="text-primary fw-bold small text-uppercase mb-3">@candidato.Cargo</p>
 
-                            <input type="hidden" name="idLista" value="@candidato.ListaPoliticaId" />
+                        <form asp-controller="Votacion" asp-action="Votar" method="post" id="form-voto-@candidato.Id">
 
-                            <input type="hidden" name="idEvento" value="@eventoId" />
+                            <input type="hidden" name="idCandidato" value="@candidato.Id" />
 
-                            <button type="submit" class="btn btn-outline-primary btn-lg w-100" onclick="return confirm('¿Está seguro de votar por la Lista @candidato.ListaPoliticaId?');">
-                                Votar por este <i class="fa-solid fa-check"></i>
+                            <input type="hidden" name="idEvento" value="@Model.Id" />
+
+                            <button type="button"
+                                    class="btn btn-primary btn-vote-action w-100 text-white"
+                                    onclick="confirmarVoto('@candidato.Id', '@candidato.Nombres')">
+                                VOTAR POR ESTE <i class="fa-solid fa-check-circle ms-2"></i>
                             </button>
                         </form>
+
                     </div>
                 </div>
             </div>
         }
     </div>
-
-    <div class="mt-4 text-center">
-        <a asp-action="Index" class="btn btn-secondary">Volver / Cancelar</a>
-    </div>
 </div>
+
+<script>
+    function confirmarVoto(id, nombre) {
+        Swal.fire({
+            title: '¿Confirmar Voto?',
+            text: "Vas a elegir a " + nombre,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4e73df',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Votar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({title: 'Enviando...', showConfirmButton: false, didOpen: () => { Swal.showLoading() }});
+
+                document.getElementById('form-voto-' + id).submit();
+            }
+        });
+    }
+</script>
