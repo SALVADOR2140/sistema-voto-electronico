@@ -22,8 +22,8 @@ namespace SistemaVotoElectronico.MVC.Controllers
             return View(data.Data);
         }
 
-        // GET: Candidatos/Create
-        public ActionResult Create()
+        // 2. CREAR (VISTA) - Aquí cargamos el combo de listas
+        public async Task<IActionResult> Create()
         {
             return View();
         }

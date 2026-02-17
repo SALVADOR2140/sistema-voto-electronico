@@ -35,7 +35,11 @@ namespace SistemaVotoElectronico.MVC.Controllers
                 ViewBag.Maximo = 0;
             }
 
-            return View(data.Data ?? new List<EventoElectoral>());
+            // 2. Estadísticas para los indicadores de la vista
+            ViewBag.Total = eventos.Count;
+            ViewBag.Activos = eventos.Count(e => e.Activo);
+
+            return View(eventos);
         }
 
         // GET: EventosElectorales/Details/5

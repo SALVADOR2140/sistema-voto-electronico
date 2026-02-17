@@ -9,6 +9,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            HttpContext.Session.Clear(); // Limpia cualquier sesión previa
             return View();
         }
 
@@ -41,7 +42,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
 
                         if (votante != null)
                         {
-                            // VALIDACIÓN: ¿Ya votó?
+                            // 1. VALIDACIÓN: ¿Ya votó?
                             if (votante.YaVoto)
                             {
                                 ViewBag.Error = "⛔ Este token ya fue utilizado. No puede volver a votar.";
