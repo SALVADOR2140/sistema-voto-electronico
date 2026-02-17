@@ -76,9 +76,13 @@ namespace SistemaVotoElectronico.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Usuario>> PostUsuario(Usuario usuario)
         {
-  
-            usuario.TokenVotacion = null;
 
+            if (usuario.RolUsuarioId == 0 || usuario.RolUsuarioId == 3)
+            {
+                usuario.RolUsuarioId = 2;
+            }
+
+            usuario.TokenVotacion = null; 
             usuario.YaVoto = false;
 
             _context.Usuarios.Add(usuario);
@@ -94,7 +98,7 @@ namespace SistemaVotoElectronico.Api.Controllers
                 }
                 else
                 {
-                    throw; 
+                    throw;
                 }
             }
 

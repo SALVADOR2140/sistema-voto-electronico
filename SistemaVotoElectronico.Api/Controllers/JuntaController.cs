@@ -18,7 +18,7 @@ namespace SistemaVotoElectronico.Api.Controllers
         }
 
         [HttpPost("GenerarToken")]
-        public async Task<IActionResult> GenerarToken([FromBody] string cedula)
+        public async Task<IActionResult> GenerarToken([FromQuery] string cedula)
         {
             // 1. Buscar al usuario
             var usuario = await _context.Usuarios

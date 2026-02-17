@@ -35,7 +35,8 @@ namespace SistemaVotoElectronico.MVC.Controllers
 
             try
             {
-                var response = await _httpClient.PostAsync($"{_apiBase}/Usuarios/GenerarTokenManual?cedula={cedula}", null);
+             
+                var response = await _httpClient.PostAsync($"{_apiBase}/Junta/GenerarToken?cedula={cedula}", null);
                 var jsonRespuesta = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)

@@ -60,7 +60,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
 
                 if (usuario.RolUsuarioId == 0)
                 {
-                    usuario.RolUsuarioId = 3;
+                    usuario.RolUsuarioId = 2;
                 }
             }
             catch (Exception ex)
