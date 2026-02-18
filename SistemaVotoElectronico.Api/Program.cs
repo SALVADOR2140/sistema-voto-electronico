@@ -53,19 +53,12 @@ namespace SistemaVotoElectronico.Api
 
             var app = builder.Build();
 
-            // 4. Pipeline
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseAuthorization();
             app.MapControllers();
 
-            // Fuerza a la aplicación a escuchar en el puerto que Render asigne o en el 10000 por defecto
-            var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
-            app.Urls.Add($"http://0.0.0.0:{port}");
 
             app.Run();
         }
