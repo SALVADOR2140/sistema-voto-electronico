@@ -17,8 +17,7 @@
                     <form asp-action="Edit" method="post" enctype="multipart/form-data">
                         <input type="hidden" asp-for="Id" />
                         <input type="hidden" asp-for="FotoUrl" />
-
-                        <div class="mb-3">
+                        <input type="hidden" asp-for="PlanGobiernoUrl" /> <div class="mb-3">
                             <label class="form-label fw-bold">Nombre Completo</label>
                             <input asp-for="Nombres" class="form-control" placeholder="Ej: Juan Pérez" required />
                             <span asp-validation-for="Nombres" class="text-danger small"></span>
@@ -74,7 +73,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Lista Política</label>
-                            <select asp-for="ListaPoliticaId" class="form-select" asp-items="ViewBag.Listas">
+                            <select name="ListaPoliticaId" asp-for="ListaPoliticaId" class="form-select" asp-items="ViewBag.Listas">
                                 <option value="">-- Sin Lista (Independiente) --</option>
                             </select>
                         </div>

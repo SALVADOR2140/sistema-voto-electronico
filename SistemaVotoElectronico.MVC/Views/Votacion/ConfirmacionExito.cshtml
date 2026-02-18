@@ -1,0 +1,47 @@
+﻿@* Vista: ConfirmacionExito.cshtml *@
+@{
+    Layout = "_Layout"; // O el nombre de tu layout principal
+    ViewData["Title"] = "Voto Exitoso";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg border-0 text-center p-5" style="max-width: 600px; border-radius: 20px;">
+        <div class="card-body">
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+            </div>
+
+            <h1 class="fw-bold text-dark mb-3">¡Voto Registrado con Éxito!</h1>
+
+            <p class="fs-5 text-muted">
+                Gracias por participar en las <strong>Elecciones UTN 2026</strong>.
+                Tu compromiso fortalece nuestra democracia universitaria.
+            </p>
+
+            <div class="alert alert-info d-flex align-items-center justify-content-center mt-4" role="alert">
+                <i class="bi bi-envelope-check-fill me-2"></i>
+                <div>
+                    Se ha enviado tu <strong>Certificado de Votación</strong> a tu correo institucional.
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-grid gap-2">
+                <a asp-controller="AccesoVotante" asp-action="Login" class="btn btn-primary btn-lg shadow-sm">
+                    <i class="bi bi-box-arrow-right me-2"></i>Finalizar y Salir
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Opcional: Evitar que el usuario regrese atrás con el botón del navegador
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+            window.history.pushState(null, "", window.location.href);
+        };
+    </script>
+}

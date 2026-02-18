@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 
 namespace SistemaVoto.Modelos
@@ -24,6 +25,7 @@ namespace SistemaVoto.Modelos
         public int ListaPoliticaId { get; set; }
 
         // Navegacion
+        [JsonIgnore]
         public ListaPolitica? ListaPolitica { get; set; }
     }
 }

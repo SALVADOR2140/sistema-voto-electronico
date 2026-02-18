@@ -13,7 +13,7 @@
                     <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-plus me-2"></i>Configurar Candidato</h5>
                 </div>
                 <div class="card-body p-5">
-                    <form asp-action="Create" autocomplete="off">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" autocomplete="off">
 
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -39,10 +39,18 @@
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label asp-for="FotoUrl" class="form-label fw-bold text-primary">URL de la Foto</label>
-                            <input asp-for="FotoUrl" class="form-control" placeholder="https://link-de-imagen.jpg" />
-                            <span asp-validation-for="FotoUrl" class="text-danger"></span>
+                        <div class="mb-4 p-3 bg-light rounded-3 border">
+                            <label class="form-label fw-bold text-primary">Fotografía del Candidato</label>
+
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-1">Opción A: Pegar URL de imagen</small>
+                                <input type="text" name="fotoUrlTexto" class="form-control" placeholder="https://link-de-imagen.jpg" />
+                            </div>
+
+                            <div class="mb-0">
+                                <small class="text-muted d-block mb-1">Opción B: Subir archivo desde PC</small>
+                                <input type="file" name="fotoArchivo" class="form-control" accept="image/*" />
+                            </div>
                         </div>
 
                         <div class="mb-4">

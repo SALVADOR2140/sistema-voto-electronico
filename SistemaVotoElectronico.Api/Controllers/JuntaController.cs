@@ -77,7 +77,7 @@ namespace SistemaVotoElectronico.Api.Controllers
                 mensaje = mensajeRespuesta,
                 nombre = usuario.Nombres,
                 correo = usuario.Correo,
-                token = tokenParaEnviar 
+                token = "Oculto por seguridad"
             });
         }
     }

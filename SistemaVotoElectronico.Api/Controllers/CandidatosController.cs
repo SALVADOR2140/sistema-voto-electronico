@@ -24,7 +24,9 @@ namespace SistemaVotoElectronico.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Candidato>>> GetCandidato()
         {
-            return await _context.Candidatos.ToListAsync();
+            return await _context.Candidatos
+                .Include(c => c.ListaPolitica)
+                .ToListAsync();
         }
 
         // GET: api/Candidatos/5
@@ -51,7 +53,22 @@ namespace SistemaVotoElectronico.Api.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(candidato).State = EntityState.Modified;
+            var candidatoDb = await _context.Candidatos.FindAsync(id);
+
+            if (candidatoDb == null)
+            {
+                return NotFound();
+            }
+
+            candidatoDb.Nombres = candidato.Nombres;
+            candidatoDb.Cargo = candidato.Cargo;
+            candidatoDb.FotoUrl = candidato.FotoUrl;
+            candidatoDb.PlanGobiernoUrl = candidato.PlanGobiernoUrl;
+
+
+            candidatoDb.ListaPoliticaId = candidato.ListaPoliticaId;
+
+            _context.Entry(candidatoDb).Property(x => x.ListaPoliticaId).IsModified = true;
 
             try
             {
@@ -59,14 +76,8 @@ namespace SistemaVotoElectronico.Api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CandidatoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                if (!CandidatoExists(id)) return NotFound();
+                else throw;
             }
 
             return NoContent();

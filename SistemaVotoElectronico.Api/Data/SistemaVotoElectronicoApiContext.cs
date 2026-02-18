@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using SistemaVoto.Modelos;
+using SistemaVotoElectronico.Modelos.Votacion;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SistemaVoto.Modelos;
 
     public class SistemaVotoElectronicoApiContext : DbContext
     {
@@ -28,6 +29,8 @@ public DbSet<SistemaVoto.Modelos.ResultadoEleccion> ResultadosElecciones { get; 
 
 public DbSet<SistemaVoto.Modelos.Voto> Votos { get; set; } = default!;
 
+public DbSet<Votante> Votantes { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -45,5 +48,15 @@ public DbSet<SistemaVoto.Modelos.Voto> Votos { get; set; } = default!;
             .WithMany()
             .HasForeignKey(v => v.ListaPoliticaId)
             .IsRequired(false);
+
+        // Esto evita que subas dos veces la misma cédula por error
+        modelBuilder.Entity<Votante>()
+            .HasIndex(v => v.Cedula)
+            .IsUnique();
+
+        // Esto asegura que nunca se repita un Token generado
+        modelBuilder.Entity<Votante>()
+            .HasIndex(v => v.Token)
+            .IsUnique();
     }
 }

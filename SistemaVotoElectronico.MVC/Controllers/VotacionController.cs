@@ -94,18 +94,20 @@ namespace SistemaVotoElectronico.MVC.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                // 1. Enviar Correo
-                if (!string.IsNullOrEmpty(emailUsuario))
+                // Capturamos el email y nombre ANTES de limpiar la sesión
+                string emailDestino = HttpContext.Session.GetString("EmailUsuario");
+                string nombreVotante = HttpContext.Session.GetString("NombreUsuario") ?? "Estudiante UTN";
+                string evento = "Elecciones Estudiantiles 2026";
+
+                if (!string.IsNullOrEmpty(emailDestino))
                 {
-                    _ = Task.Run(() => _emailService.EnviarCertificado(emailUsuario, "Estudiante", "Elecciones 2026"));
+                    // Usamos Task.Run para que la pantalla de éxito cargue de inmediato
+                    _ = Task.Run(async () => {
+                        await _emailService.EnviarCertificado(emailDestino, nombreVotante, evento);
+                    });
                 }
 
-                // 2. CERRAR SESIÓN 
-                HttpContext.Session.Clear();
-
-                // 3. Redirigir al Inicio con mensaje de éxito
-                TempData["VotoExitoso"] = "true";
-                return RedirectToAction("Index", "Inicio");
+                return RedirectToAction("ConfirmacionExito");
             }
             else
             {
@@ -150,6 +152,15 @@ namespace SistemaVotoElectronico.MVC.Controllers
                 Console.WriteLine($"Error al leer API: {ex.Message}");
             }
             return default(T);
+        }
+
+        public IActionResult ConfirmacionExito()
+        {
+            // Opcional: Guardamos el email en un ViewBag antes de limpiar la sesión
+            ViewBag.Email = HttpContext.Session.GetString("EmailUsuario");
+
+            HttpContext.Session.Clear();
+            return View();
         }
     }
 }

@@ -124,5 +124,23 @@ namespace SistemaVotoElectronico.Api.Controllers
         {
             return _context.Usuarios.Any(e => e.Id == id);
         }
+
+        // POST: api/Usuarios/Masivo
+        [HttpPost("Masivo")]
+        public async Task<IActionResult> PostUsuariosMasivo([FromBody] List<Usuario> usuarios)
+        {
+            if (usuarios == null || !usuarios.Any()) return BadRequest();
+
+            try
+            {
+                _context.Usuarios.AddRange(usuarios);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error al insertar: " + ex.InnerException?.Message);
+            }
+        }
     }
 }

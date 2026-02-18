@@ -73,11 +73,13 @@ namespace SistemaVotoElectronico.Api.Servicios
                 var emailOrigen = _config["ConfiguracionCorreo:EmailOrigen"];
                 var password = _config["ConfiguracionCorreo:PasswordAplicacion"];
                 var host = _config["ConfiguracionCorreo:SmtpHost"];
-                var port = int.Parse(_config["ConfiguracionCorreo:SmtpPort"]);
+                // Cambia esto para evitar errores de conversión si el config viene como int o string
+                var port = int.Parse(_config["ConfiguracionCorreo:SmtpPort"] ?? "587");
 
                 var smtpClient = new SmtpClient(host)
                 {
                     Port = port,
+                    UseDefaultCredentials = false, // AGREGA ESTA LÍNEA ANTES
                     Credentials = new NetworkCredential(emailOrigen, password),
                     EnableSsl = true,
                 };

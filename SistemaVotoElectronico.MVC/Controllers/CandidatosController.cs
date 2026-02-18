@@ -36,11 +36,13 @@ namespace SistemaVotoElectronico.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Candidato candidato, IFormFile? fotoArchivo, string? fotoUrlTexto)
         {
+            // 1. LIMPIEZA TOTAL: Eliminamos las validaciones que estorban
             ModelState.Remove("ListaPolitica");
             ModelState.Remove("fotoArchivo");
             ModelState.Remove("fotoUrlTexto");
             ModelState.Remove("FotoUrl");
 
+            // Lógica de procesamiento de imagen
             try
             {
                 if (fotoArchivo != null && fotoArchivo.Length > 0)
@@ -48,18 +50,12 @@ namespace SistemaVotoElectronico.MVC.Controllers
                     using (var memoryStream = new MemoryStream())
                     {
                         await fotoArchivo.CopyToAsync(memoryStream);
-                        byte[] imageBytes = memoryStream.ToArray();
-                        string base64String = Convert.ToBase64String(imageBytes);
-                        candidato.FotoUrl = $"data:image/png;base64,{base64String}";
+                        candidato.FotoUrl = $"data:image/png;base64,{Convert.ToBase64String(memoryStream.ToArray())}";
                     }
                 }
                 else if (!string.IsNullOrEmpty(fotoUrlTexto))
                 {
                     candidato.FotoUrl = fotoUrlTexto.Trim();
-                }
-                else
-                {
-                    candidato.FotoUrl = null;
                 }
             }
             catch (Exception ex)
@@ -67,27 +63,39 @@ namespace SistemaVotoElectronico.MVC.Controllers
                 ModelState.AddModelError("", "Error imagen: " + ex.Message);
             }
 
-            if (ModelState.IsValid)
+            // 2. ENVÍO LIMPIO (Clave para evitar el BadRequest)
+            // Creamos un objeto anónimo para enviar SOLO lo que la base de datos necesita
+            var datosLimpios = new
             {
-                var json = JsonConvert.SerializeObject(candidato);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                nombres = candidato.Nombres,
+                cargo = candidato.Cargo,
+                fotoUrl = candidato.FotoUrl,
+                planGobiernoUrl = candidato.PlanGobiernoUrl,
+                listaPoliticaId = candidato.ListaPoliticaId // Asegúrate que este valor no sea 0
+            };
 
-                try
+            var json = JsonConvert.SerializeObject(datosLimpios);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            try
+            {
+                var response = await _httpClient.PostAsync(_apiUrl, content);
+                if (response.IsSuccessStatusCode)
                 {
-                    var response = await _httpClient.PostAsync(_apiUrl, content);
-                    if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
-                    else
-                    {
-                        var errorMsg = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError("", $"Error API: {response.StatusCode} - {errorMsg}");
-                    }
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (Exception ex)
+                else
                 {
-                    ModelState.AddModelError("", "Error conexión: " + ex.Message);
+                    var errorMsg = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError("", $"Error API: {errorMsg}");
                 }
             }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error conexión: " + ex.Message);
+            }
 
+            // Si falló, recargar el combo para la vista
             var listas = await ObtenerListaGenerica<ListaPolitica>(_apiListas);
             ViewBag.Listas = new SelectList(listas, "Id", "Nombre", candidato.ListaPoliticaId);
             return View(candidato);
@@ -143,10 +151,16 @@ namespace SistemaVotoElectronico.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Candidato candidato, IFormFile? fotoArchivo, string? fotoUrlTexto)
         {
+
+            candidato.Id = id;
+
             ModelState.Remove("ListaPolitica");
             ModelState.Remove("fotoArchivo");
             ModelState.Remove("fotoUrlTexto");
+            ModelState.Remove("FotoUrl");
+            ModelState.Remove("PlanGobiernoUrl");
 
+            // Lógica de procesamiento de imagen
             try
             {
                 if (fotoArchivo != null && fotoArchivo.Length > 0)
@@ -154,9 +168,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
                     using (var memoryStream = new MemoryStream())
                     {
                         await fotoArchivo.CopyToAsync(memoryStream);
-                        byte[] imageBytes = memoryStream.ToArray();
-                        string base64String = Convert.ToBase64String(imageBytes);
-                        candidato.FotoUrl = $"data:image/png;base64,{base64String}";
+                        candidato.FotoUrl = $"data:image/png;base64,{Convert.ToBase64String(memoryStream.ToArray())}";
                     }
                 }
                 else if (!string.IsNullOrEmpty(fotoUrlTexto))
@@ -164,34 +176,45 @@ namespace SistemaVotoElectronico.MVC.Controllers
                     candidato.FotoUrl = fotoUrlTexto.Trim();
                 }
             }
+            catch { }
+
+
+            var datosLimpios = new
+            {
+                id = candidato.Id,
+                nombres = candidato.Nombres,
+                cargo = candidato.Cargo,
+                fotoUrl = candidato.FotoUrl,
+                planGobiernoUrl = candidato.PlanGobiernoUrl,
+                listaPoliticaId = candidato.ListaPoliticaId 
+            };
+
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(datosLimpios);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            try
+            {
+                var response = await _httpClient.PutAsync($"{_apiUrl}/{id}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+      
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError("", "Error en API: " + error);
+                }
+            }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Error imagen: " + ex.Message);
+                ModelState.AddModelError("", "Error de conexión: " + ex.Message);
             }
 
-            if (ModelState.IsValid)
-            {
-                var json = JsonConvert.SerializeObject(candidato);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                try
-                {
-                    var response = await _httpClient.PutAsync($"{_apiUrl}/{id}", content);
-                    if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
-                    else
-                    {
-                        var errorMsg = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError("", $"Error API: {response.StatusCode} - {errorMsg}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Error conexión: " + ex.Message);
-                }
-            }
 
             var listas = await ObtenerListaGenerica<ListaPolitica>(_apiListas);
-            ViewBag.Listas = new SelectList(listas, "Id", "Nombre", candidato.ListaPoliticaId);
+            ViewBag.Listas = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(listas, "Id", "Nombre", candidato.ListaPoliticaId);
             return View(candidato);
         }
 
