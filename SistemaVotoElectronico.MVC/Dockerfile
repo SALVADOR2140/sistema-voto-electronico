@@ -1,34 +1,43 @@
-# 1. IMAGEN BASE (Entorno para correr la app)
+# 1. IMAGEN BASE
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 8080
-ENV ASPNETCORE_HTTP_PORTS=8080
+# Usamos el puerto 10000 para estandarizar con tu API
+ENV ASPNETCORE_HTTP_PORTS=10000
+EXPOSE 10000
 
-# 2. COMPILACIÓN (Entorno para construir el código)
+# 2. COMPILACIÓN
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copia el archivo de proyecto del MVC
-# ASEGÚRATE que el nombre de la carpeta coincida con el tuyo
-COPY ["SistemaVotoElectronico.Web/SistemaVotoElectronico.Web.csproj", "SistemaVotoElectronico.Web/"]
+# --- CORRECCIÓN 1: Nombres de carpetas exactos ---
+# Copiamos el proyecto MVC (Cambiamos "Web" por "MVC")
+COPY ["SistemaVotoElectronico.MVC/SistemaVotoElectronico.MVC.csproj", "SistemaVotoElectronico.MVC/"]
 
-# Si tu proyecto MVC usa una librería compartida (ej. "Shared"), descomenta la línea de abajo:
-# COPY ["SistemaVotoElectronico.Shared/SistemaVotoElectronico.Shared.csproj", "SistemaVotoElectronico.Shared/"]
+# --- CORRECCIÓN 2: Agregamos dependencias ---
+# Seguramente el MVC usa los Modelos, así que debemos copiarlos también
+COPY ["SistemaVotoElectronico.Modelos/SistemaVotoElectronico.Modelos.csproj", "SistemaVotoElectronico.Modelos/"]
 
-# Restaura las dependencias
-RUN dotnet restore "SistemaVotoElectronico.Web/SistemaVotoElectronico.Web.csproj"
+# Restauramos las dependencias del MVC
+RUN dotnet restore "SistemaVotoElectronico.MVC/SistemaVotoElectronico.MVC.csproj"
 
-# Copia todo el resto del código
+# Copiamos todo el código restante
 COPY . .
-WORKDIR "/src/SistemaVotoElectronico.Web"
-RUN dotnet build "SistemaVotoElectronico.Web.csproj" -c Release -o /app/build
+
+# Nos movemos a la carpeta correcta
+WORKDIR "/src/SistemaVotoElectronico.MVC"
+
+# Compilamos
+RUN dotnet build "SistemaVotoElectronico.MVC.csproj" -c Release -o /app/build
 
 # 3. PUBLICACIÓN
 FROM build AS publish
-RUN dotnet publish "SistemaVotoElectronico.Web.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "SistemaVotoElectronico.MVC.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # 4. FINAL
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "SistemaVotoElectronico.Web.dll"]
+
+# --- CORRECCIÓN 3: Nombre del DLL final ---
+# El archivo compilado se llamará .MVC.dll, no .Web.dll
+ENTRYPOINT ["dotnet", "SistemaVotoElectronico.MVC.dll"]
