@@ -15,18 +15,8 @@ namespace SistemaVotoElectronico.Api
             Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             builder.Host.UseSerilog();
 
-            //// 2. CONEXIÓN A BASE DE DATOS (Usando el nombre exacto del JSON)
-            //var connectionString = builder.Configuration.GetConnectionString("CadenaPostgres");
-
-            //builder.Services.AddDbContext<SistemaVotoElectronicoApiContext>(options =>
-            //{
-            //    options.UseNpgsql(connectionString);
-            //});
-
-            // 2. CONEXIÓN A BASE DE DATOS
             var connectionString = builder.Configuration.GetConnectionString("CadenaPostgres");
 
-            // Agregamos esta validación para que la consola no se pierda
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new Exception("No se encontró la CadenaPostgres en appsettings.json");
@@ -37,7 +27,6 @@ namespace SistemaVotoElectronico.Api
                 options.UseNpgsql(connectionString);
             });
 
-            // 3. Configuración básica de controladores
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             );
@@ -45,20 +34,37 @@ namespace SistemaVotoElectronico.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Licencia PDF (Opcional, para que no de error si lo tienes)
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
-            //Servicio de Email
             builder.Services.AddScoped<SistemaVotoElectronico.Api.Servicios.IEmailService, SistemaVotoElectronico.Api.Servicios.EmailService>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("PermitirTodo", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
 
             var app = builder.Build();
 
+            // Registrar automáticamente las peticiones/respuestas en Serilog
+            app.UseSerilogRequestLogging();
+
+            if (app.Environment.IsDevelopment())
+            {
+                // Muestra detalles de excepciones cuando estás en Development
+                app.UseDeveloperExceptionPage();
+            }
+
             app.UseSwagger();
+            app.UseCors("PermitirTodo");
             app.UseSwaggerUI();
 
             app.UseAuthorization();
             app.MapControllers();
-
 
             app.Run();
         }

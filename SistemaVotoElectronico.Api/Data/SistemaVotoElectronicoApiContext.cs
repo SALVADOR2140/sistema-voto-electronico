@@ -35,6 +35,17 @@ public DbSet<Votante> Votantes { get; set; } = default!;
     {
         base.OnModelCreating(modelBuilder);
 
+        // 1. FORZAR NOMBRES DE TABLAS (Para que coincidan con pgAdmin)
+        modelBuilder.Entity<Usuario>().ToTable("Usuarios"); // Asegura el uso de "Usuarios"
+        modelBuilder.Entity<RolUsuario>().ToTable("RolUsuarios"); // Asegura el uso de "RolUsuarios" con 's'
+
+        // 2. CONFIGURAR RELACIÓN USUARIO -> ROL
+        modelBuilder.Entity<Usuario>()
+            .HasOne(u => u.RolUsuario)
+            .WithMany()
+            .HasForeignKey(u => u.RolUsuarioId); // Vincula la FK con la propiedad de navegación
+
+        // 3. ÍNDICES DE USUARIO
         modelBuilder.Entity<Usuario>()
             .HasIndex(u => u.Cedula)
             .IsUnique();
@@ -43,18 +54,18 @@ public DbSet<Votante> Votantes { get; set; } = default!;
             .HasIndex(u => u.TokenVotacion)
             .IsUnique();
 
+        // 4. CONFIGURACIÓN DE VOTOS
         modelBuilder.Entity<Voto>()
             .HasOne(v => v.ListaPolitica)
             .WithMany()
             .HasForeignKey(v => v.ListaPoliticaId)
             .IsRequired(false);
 
-        // Esto evita que subas dos veces la misma cédula por error
+        // 5. CONFIGURACIÓN DE VOTANTES
         modelBuilder.Entity<Votante>()
             .HasIndex(v => v.Cedula)
             .IsUnique();
 
-        // Esto asegura que nunca se repita un Token generado
         modelBuilder.Entity<Votante>()
             .HasIndex(v => v.Token)
             .IsUnique();

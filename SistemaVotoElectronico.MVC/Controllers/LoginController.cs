@@ -37,14 +37,21 @@ namespace SistemaVotoElectronico.MVC.Controllers
                         ViewBag.Error = "⚠️ Error Crítico: No se configuró la URL de la API.";
                         return View("Index");
                     }
-
+                    
                     // Aseguramos que la URL no tenga doble barra al final
                     baseUrl = baseUrl.TrimEnd('/');
-
+                    
                     // Armamos la URL final
                     string urlApi = $"{baseUrl}/api/Auth/LoginWeb";
 
-                    var loginDto = new { Correo = usuario, Clave = clave };
+                    
+                    // Por esto (usando un Diccionario para asegurar los nombres):
+                    var loginDto = new Dictionary<string, string>
+                    {
+                        { "Correo", usuario }, // Asegúrate que en la API el DTO diga "Correo"
+                        { "Clave", clave }
+                    };
+
                     var content = new StringContent(JsonConvert.SerializeObject(loginDto), Encoding.UTF8, "application/json");
 
                     var response = await client.PostAsync(urlApi, content);
@@ -55,7 +62,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(json);
 
                         string rolNombre = ((string)data.rol)?.Trim().ToLower() ?? "";
-                        int rolId = 3;
+                        int rolId = 3; 
 
                         if (rolNombre.Contains("admin")) rolId = 1;
                         else if (rolNombre.Contains("candidato")) rolId = 2;
@@ -73,19 +80,19 @@ namespace SistemaVotoElectronico.MVC.Controllers
                             ViewBag.TipoEsperado = tipoEsperado;
                             return View("Index");
                         }
-
+  
                         HttpContext.Session.SetString("UsuarioLogueado", (string)data.nombre);
                         HttpContext.Session.SetInt32("RolUsuarioId", rolId);
 
-                        if (rolId == 1) return RedirectToAction("Index", "Home");
-                        if (rolId == 2) return RedirectToAction("Index", "Home");
+                        if (rolId == 1) return RedirectToAction("Index", "Home"); 
+                        if (rolId == 2) return RedirectToAction("Index", "Home"); 
 
                         return RedirectToAction("Index", "Votacion");
                     }
                     else
                     {
                         ViewBag.Error = "Usuario o contraseña incorrectos.";
-                        ViewBag.TipoEsperado = tipoEsperado;
+                        ViewBag.TipoEsperado = tipoEsperado; 
                         return View("Index");
                     }
                 }
@@ -102,7 +109,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
         public IActionResult Salir()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Inicio");
+            return RedirectToAction("Index", "Inicio"); 
         }
     }
 }

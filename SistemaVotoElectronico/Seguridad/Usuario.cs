@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace SistemaVoto.Modelos
@@ -24,6 +25,8 @@ namespace SistemaVoto.Modelos
         public int RolUsuarioId { get; set; }
 
         // Navegacion
+        // Mapeo explícito a la FK
+        [ForeignKey("RolUsuarioId")]
         public RolUsuario? RolUsuario { get; set; }
     }
 }
