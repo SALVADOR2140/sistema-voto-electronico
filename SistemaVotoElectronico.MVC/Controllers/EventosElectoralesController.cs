@@ -12,7 +12,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
     {
         // 1. INYECCIÓN DE HTTP
         private readonly HttpClient _httpClient;
-        private readonly string _apiBase = "https://localhost:7265/api";
+        private readonly string _apiBase = "https://sistema-voto-electronico-z3q0.onrender.com/api";
 
         public EventosElectoralesController(IHttpClientFactory httpClientFactory)
         {
