@@ -9,7 +9,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
     public class UsuariosController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl = "http://localhost:5111/api/Usuarios";
+        private readonly string _apiUrl = "https://sistema-voto-electronico-z3q0.onrender.com/api/Usuarios";
 
         public UsuariosController(IHttpClientFactory httpClientFactory)
         {

@@ -8,7 +8,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
     public class JuntasController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiBase = "http://localhost:5111/api";
+        private readonly string _apiBase = "https://sistema-voto-electronico-z3q0.onrender.com/api";
 
         public JuntasController(IHttpClientFactory httpClientFactory)
         {

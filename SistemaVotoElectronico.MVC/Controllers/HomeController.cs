@@ -10,10 +10,10 @@ namespace SistemaVotoElectronico.MVC.Controllers
     {
         private readonly HttpClient _httpClient;
 
-        private readonly string _apiEventos = "http://localhost:5111/api/EventosElectorales";
-        private readonly string _apiCandidatos = "http://localhost:5111/api/Candidatos";
-        private readonly string _apiVotantes = "http://localhost:5111/api/Usuarios";
-        // private readonly string _apiVotos = "http://localhost:5111/api/Votos"; 
+        private readonly string _apiEventos = "https://sistema-voto-electronico-z3q0.onrender.com/api/EventosElectorales";
+        private readonly string _apiCandidatos = "https://sistema-voto-electronico-z3q0.onrender.com/api/Candidatos";
+        private readonly string _apiVotantes = "https://sistema-voto-electronico-z3q0.onrender.com/api/Usuarios";
+        // private readonly string _apiVotos = "https://sistema-voto-electronico-z3q0.onrender.com/api/Votos"; 
 
         public HomeController(IHttpClientFactory httpClientFactory)
         {

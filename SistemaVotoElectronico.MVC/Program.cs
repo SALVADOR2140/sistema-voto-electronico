@@ -11,11 +11,11 @@ namespace SistemaVotoElectronico.MVC
         public static void Main(string[] args)
         {
             // Configuración de URLs de la API
-            Crud<EventoElectoral>.UrlBase = "http://localhost:5111/api/EventosElectorales";
-            Crud<Candidato>.UrlBase = "http://localhost:5111/api/Candidatos";
-            Crud<Voto>.UrlBase = "http://localhost:5111/api/Votos";
-            Crud<Usuario>.UrlBase = "http://localhost:5111/api/Usuarios";
-            Crud<ListaPolitica>.UrlBase = "http://localhost:5111/api/ListasPoliticas";
+            Crud<EventoElectoral>.UrlBase = "https://sistema-voto-electronico-z3q0.onrender.com/api/EventosElectorales";
+            Crud<Candidato>.UrlBase = "https://sistema-voto-electronico-z3q0.onrender.com/api/Candidatos";
+            Crud<Voto>.UrlBase = "https://sistema-voto-electronico-z3q0.onrender.com/api/Votos";
+            Crud<Usuario>.UrlBase = "https://sistema-voto-electronico-z3q0.onrender.com/api/Usuarios";
+            Crud<ListaPolitica>.UrlBase = "https://sistema-voto-electronico-z3q0.onrender.com/api/ListasPoliticas";
 
             var builder = WebApplication.CreateBuilder(args);
 
@@ -32,10 +32,9 @@ namespace SistemaVotoElectronico.MVC
                 });
 
             // 2. CONFIGURACIÓN DE SESIONES
-            builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.IdleTimeout = TimeSpan.FromHours(2);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });

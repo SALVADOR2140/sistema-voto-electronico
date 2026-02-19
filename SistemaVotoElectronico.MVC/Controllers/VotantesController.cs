@@ -12,7 +12,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
 
       
         // Cuando ejecutas la API, fíjate en la barra de direcciones
-        private readonly string _apiUrl = "http://localhost:5111/api/Usuarios";
+        private readonly string _apiUrl = "https://sistema-voto-electronico-z3q0.onrender.com/api/Usuarios";
 
         public VotantesController(IHttpClientFactory httpClientFactory)
         {

@@ -26,7 +26,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
             {
                 using (var client = new HttpClient())
                 {
-                    string urlApi = "http://localhost:5111/api/Usuarios";
+                    string urlApi = "https://sistema-voto-electronico-z3q0.onrender.com/api/Usuarios";
                     var response = await client.GetAsync(urlApi);
 
                     if (response.IsSuccessStatusCode)

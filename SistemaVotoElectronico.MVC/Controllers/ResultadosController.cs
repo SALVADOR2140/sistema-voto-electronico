@@ -8,7 +8,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
     public class ResultadosController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiBase = "http://localhost:5111/api";
+        private readonly string _apiBase = "https://sistema-voto-electronico-z3q0.onrender.com/api";
         private const int NUMERO_ESCAÑOS = 5;
 
         public ResultadosController(IHttpClientFactory httpClientFactory)

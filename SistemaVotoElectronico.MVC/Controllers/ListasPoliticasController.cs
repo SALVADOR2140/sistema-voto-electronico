@@ -11,8 +11,8 @@ namespace SistemaVotoElectronico.MVC.Controllers
     public class ListasPoliticasController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl = "http://localhost:5111/api/ListasPoliticas";
-        private readonly string _apiEventos = "http://localhost:5111/api/EventosElectorales";
+        private readonly string _apiUrl = "https://sistema-voto-electronico-z3q0.onrender.com/api/ListasPoliticas";
+        private readonly string _apiEventos = "https://sistema-voto-electronico-z3q0.onrender.com/api/EventosElectorales";
 
         public ListasPoliticasController(IHttpClientFactory httpClientFactory)
         {

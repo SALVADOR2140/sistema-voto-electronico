@@ -11,7 +11,7 @@ namespace SistemaVotoElectronico.MVC.Controllers
     {
         private readonly HttpClient _httpClient;
         private readonly IEmailService _emailService;
-        private readonly string _apiBase = "http://localhost:5111/api";
+        private readonly string _apiBase = "https://sistema-voto-electronico-z3q0.onrender.com/api";
 
         public VotacionController(IHttpClientFactory httpClientFactory, IEmailService emailService)
         {

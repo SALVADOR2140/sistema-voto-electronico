@@ -10,8 +10,8 @@ namespace SistemaVotoElectronico.MVC.Controllers
     public class CandidatosController : Controller
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiUrl = "http://localhost:5111/api/Candidatos";
-        private readonly string _apiListas = "http://localhost:5111/api/ListasPoliticas";
+        private readonly string _apiUrl = "https://sistema-voto-electronico-z3q0.onrender.com/api/Candidatos";
+        private readonly string _apiListas = "https://sistema-voto-electronico-z3q0.onrender.com/api/ListasPoliticas";
 
         public CandidatosController(IHttpClientFactory httpClientFactory)
         {

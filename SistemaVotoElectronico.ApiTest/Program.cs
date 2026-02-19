@@ -9,7 +9,7 @@ namespace SistemaVotoElectronico.ApiTest
     {
         static void Main(string[] args)
         {
-            Crud<EventoElectoral>.UrlBase = "http://127.0.0.1:5111/api/EventosElectorales";
+            Crud<EventoElectoral>.UrlBase = "https://sistema-voto-electronico-z3q0.onrender.com/api/EventosElectorales";
 
             // CREATE (Insertar)
             var nuevoEvento = new EventoElectoral
