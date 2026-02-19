@@ -22,7 +22,7 @@
             <h1 class="fw-bold text-dark mb-3">Certificado de Votación</h1>
 
             <p class="fs-5 text-muted">
-                Por medio de la presente se certifica que el ciudadano ha participado con éxito en las <strong>Elecciones UTN 2026</strong>[cite: 1, 5].
+                [cite_start]Por medio de la presente se certifica que el ciudadano ha participado con éxito en las <strong>Elecciones UTN 2026</strong>[cite: 1, 5].
             </p>
 
             @* Cambiamos el mensaje del correo por la instrucción de descarga *@
@@ -34,7 +34,7 @@
             </div>
 
             <div class="only-print mt-4 text-start" style="display:none;">
-                <p><strong>Estado:</strong> Sufragio Completado [cite: 19]</p>
+                [cite_start]<p><strong>Estado:</strong> Sufragio Completado [cite: 19]</p>
                 <p><strong>Fecha:</strong> @DateTime.Now.ToString("f")</p>
                 <p><strong>Código de Verificación:</strong> @Guid.NewGuid().ToString().Substring(0, 8).ToUpper()</p>
             </div>
@@ -57,27 +57,26 @@
 
 <style>
     /* Estilos para que el PDF se vea profesional */
-    @media print {
-        .no-print
+    /* Usamos doble @@ para que Razor no lo confunda con código C# */
+    @@media print {
+        .no-print {
+            display: none !important;
+        }
 
-    {
-        display: none !important;
-    }
+        .only-print {
+            display: block !important;
+        }
 
-    .only-print {
-        display: block !important;
-    }
+        .pro-card {
+            box-shadow: none !important;
+            border: 2px solid #eee !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+        }
 
-    .pro-card {
-        box-shadow: none !important;
-        border: 2px solid #eee !important;
-        margin: 0 auto !important;
-    }
-
-    body {
-        background-color: white !important;
-    }
-
+        body {
+            background-color: white !important;
+        }
     }
 </style>
 
