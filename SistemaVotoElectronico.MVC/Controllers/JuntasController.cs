@@ -41,9 +41,10 @@ namespace SistemaVotoElectronico.MVC.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var jsonObj = JToken.Parse(jsonRespuesta);
-                    TempData["TokenGenerado"] = jsonObj["token"]?.ToString() ?? jsonObj["result"]?["token"]?.ToString();
-                    TempData["MensajeExito"] = $"Votante Habilitado: {jsonObj["nombre"] ?? jsonObj["result"]?["nombres"]}";
+                    var jsonObj = JObject.Parse(jsonRespuesta);
+                    // Usamos el operador ? para evitar que el programa se rompa si el campo no existe
+                    TempData["TokenGenerado"] = jsonObj["token"]?.ToString();
+                    TempData["MensajeExito"] = jsonObj["nombres"]?.ToString() ?? "Votante Habilitado";
                 }
                 else
                 {
