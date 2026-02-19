@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Newtonsoft.Json;
+using Resend; // 1. Agregamos el using de Resend
 
 namespace SistemaVotoElectronico.Api
 {
@@ -36,7 +37,20 @@ namespace SistemaVotoElectronico.Api
 
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
+           
+            // CONFIGURACIÓN DE RESEND (API DE CORREOS)
+        
+            builder.Services.AddOptions();
+            builder.Services.AddHttpClient<IResend, ResendClient>();
+            builder.Services.Configure<ResendClientOptions>(options =>
+            {
+                // Aplicamos tu llave maestra de VOTO_SEGURO_UTN
+                options.ApiToken = "re_Dg3nFKtP_7phjtsEFowsyxg1EpG5sGzUF";
+            });
+
+            // Registrar el servicio de Email
             builder.Services.AddScoped<SistemaVotoElectronico.Api.Servicios.IEmailService, SistemaVotoElectronico.Api.Servicios.EmailService>();
+            
 
             builder.Services.AddCors(options =>
             {
@@ -50,12 +64,10 @@ namespace SistemaVotoElectronico.Api
 
             var app = builder.Build();
 
-            // Registrar automáticamente las peticiones/respuestas en Serilog
             app.UseSerilogRequestLogging();
 
             if (app.Environment.IsDevelopment())
             {
-                // Muestra detalles de excepciones cuando estás en Development
                 app.UseDeveloperExceptionPage();
             }
 
