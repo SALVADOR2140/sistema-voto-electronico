@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Mail;
+﻿using Resend;
 
 namespace SistemaVotoElectronico.Api.Servicios
 {
@@ -11,53 +10,66 @@ namespace SistemaVotoElectronico.Api.Servicios
 
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _config;
+        private readonly IResend _resend;
 
-        public EmailService(IConfiguration config)
+        public EmailService(IResend resend)
         {
-            _config = config;
+            _resend = resend;
         }
 
-
-        // MÉTODO 1: ENVIAR TOKEN (MODO DEMO RENDER)
-   
+        // MÉTODO 1: ENVIAR TOKEN REAL CON RESEND
         public async Task<bool> EnviarToken(string correoDestino, string nombre, string token)
         {
             try
             {
-                // SIMULAMOS EL ENVÍO PARA EVITAR EL BLOQUEO DEL FIREWALL DE RENDER
-                Console.WriteLine($"[MODO DEMO] Simulando envío de Token a: {correoDestino}. Token: {token}");
+                var message = new EmailMessage();
+                message.From = "VOTO SEGURO UTN <onboarding@resend.dev>";
+                message.To.Add(correoDestino);
+                message.Subject = "🔐 Tu Token de Seguridad - UTN";
+                message.HtmlBody = $@"
+                    <div style='font-family: sans-serif; border-top: 4px solid #0d6efd; padding: 20px;'>
+                        <h2 style='color: #0d6efd;'>VOTO SEGURO UTN</h2>
+                        <p>Hola <b>{nombre}</b>, tu token de acceso único es:</p>
+                        <h1 style='background: #f8f9fa; border: 1px solid #ddd; padding: 15px; text-align: center; letter-spacing: 5px;'>{token}</h1>
+                        <p>Usa este código en la urna electrónica.</p>
+                        <small style='color: gray;'>Este es un proceso automático, por favor no responda este correo.</small>
+                    </div>";
 
-                // Esperamos medio segundo para simular el proceso de red
-                await Task.Delay(500);
-
-                // Retornamos true inmediatamente para que el MVC reciba el OK y muestre la pantalla verde
+                await _resend.EmailSendAsync(message);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR EMAIL TOKEN] {ex.Message}");
+                Console.WriteLine($"[ERROR RESEND TOKEN]: {ex.Message}");
                 return false;
             }
         }
 
-
-        // MÉTODO 2: ENVIAR CERTIFICADO (MODO DEMO RENDER)
-
+        // MÉTODO 2: ENVIAR CERTIFICADO REAL CON RESEND
         public async Task<bool> EnviarCertificado(string correoDestino, string nombreVotante, string nombreEvento)
         {
             try
             {
-                // SIMULAMOS EL ENVÍO PARA EVITAR EL BLOQUEO DEL FIREWALL DE RENDER
-                Console.WriteLine($"[MODO DEMO] Simulando envío de Certificado a: {correoDestino}. Evento: {nombreEvento}");
+                var message = new EmailMessage();
+                message.From = "VOTO SEGURO UTN <onboarding@resend.dev>";
+                message.To.Add(correoDestino);
+                message.Subject = "🗳️ Certificado de Votación - UTN";
+                message.HtmlBody = $@"
+                    <div style='font-family: sans-serif; border: 2px solid #0d6efd; padding: 30px; text-align: center;'>
+                        <h2 style='color: #0d6efd;'>CERTIFICADO DE SUFRAGIO</h2>
+                        <p>El sistema <b>VOTO SEGURO UTN</b> certifica que:</p>
+                        <h3>{nombreVotante}</h3>
+                        <p>Ha votado con éxito en el evento: <b>{nombreEvento}</b></p>
+                        <hr>
+                        <small>Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}</small>
+                    </div>";
 
-                await Task.Delay(500);
-
+                await _resend.EmailSendAsync(message);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR EMAIL CERTIFICADO] {ex.Message}");
+                Console.WriteLine($"[ERROR RESEND CERTIFICADO]: {ex.Message}");
                 return false;
             }
         }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemaVotoElectronico.Api.Servicios; 
+using SistemaVotoElectronico.Api.Servicios;
 
 namespace SistemaVotoElectronico.Api.Controllers
 {
@@ -14,7 +14,7 @@ namespace SistemaVotoElectronico.Api.Controllers
         public JuntaController(SistemaVotoElectronicoApiContext context, IEmailService emailService)
         {
             _context = context;
-            _emailService = emailService; 
+            _emailService = emailService;
         }
 
         [HttpPost("GenerarToken")]
@@ -30,7 +30,7 @@ namespace SistemaVotoElectronico.Api.Controllers
             if (usuario.YaVoto)
                 return BadRequest(new { mensaje = "⛔ Este usuario YA ejerció su voto. No se puede generar token." });
 
-            // 3. LÓGICA DE TOKEN ÚNICO (Aquí está el cambio)
+            // 3. LÓGICA DE TOKEN ÚNICO
             string tokenParaEnviar;
             bool esNuevoToken = false;
 
@@ -61,11 +61,26 @@ namespace SistemaVotoElectronico.Api.Controllers
                 }
             }
 
-            // 5. Enviamos el correo 
-            bool enviado = await _emailService.EnviarToken(usuario.Correo, usuario.Nombres, tokenParaEnviar);
+            // 5. Enviamos el correo con manejo de errores
+            bool enviado = false;
+            try
+            {
+                enviado = await _emailService.EnviarToken(usuario.Correo, usuario.Nombres, tokenParaEnviar);
 
-            if (!enviado)
-                return StatusCode(500, new { mensaje = "El token existe, pero falló el envío del correo." });
+                if (!enviado)
+                {
+                    // Devolvemos el token en la respuesta por si falla el correo (por restricciones de la capa gratuita)
+                    return StatusCode(500, new
+                    {
+                        mensaje = $"Error de proveedor: El token existe ({tokenParaEnviar}), pero falló el envío al correo {usuario.Correo}. Verifique si el correo está autorizado en la capa gratuita.",
+                        token_respaldo = tokenParaEnviar
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = "Fallo crítico en el servicio de correo: " + ex.Message });
+            }
 
             // 6. Respondemos al Cliente
             string mensajeRespuesta = esNuevoToken
@@ -77,7 +92,8 @@ namespace SistemaVotoElectronico.Api.Controllers
                 mensaje = mensajeRespuesta,
                 nombre = usuario.Nombres,
                 correo = usuario.Correo,
-                token = "Oculto por seguridad"
+                // Temporalmente visible para facilitar tus pruebas
+                token = tokenParaEnviar
             });
         }
     }
