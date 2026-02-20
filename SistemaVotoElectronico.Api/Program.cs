@@ -37,9 +37,9 @@ namespace SistemaVotoElectronico.Api
 
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
-           
+
             // CONFIGURACIÓN DE RESEND (API DE CORREOS)
-        
+
             builder.Services.AddOptions();
             builder.Services.AddHttpClient<IResend, ResendClient>();
             builder.Services.Configure<ResendClientOptions>(options =>
@@ -50,7 +50,7 @@ namespace SistemaVotoElectronico.Api
 
             // Registrar el servicio de Email
             builder.Services.AddScoped<SistemaVotoElectronico.Api.Servicios.IEmailService, SistemaVotoElectronico.Api.Servicios.EmailService>();
-            
+
 
             builder.Services.AddCors(options =>
             {
